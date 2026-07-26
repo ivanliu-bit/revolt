@@ -1,4 +1,4 @@
-# ReVolt — Device Buyback & Component Resale Platform
+# GreenVolt — Device Buyback & Component Resale Platform
 
 Student-founded circular-economy startup (SHAD 2026, University of Alberta, Team Green). Buys broken phones/small electronics from consumers, harvests reusable components, resells to repair shops/refurbishers, and routes true scrap through certified domestic recycling instead of informal export.
 
@@ -18,7 +18,7 @@ This repo currently holds a **single-file static demo** (`index.html`) built for
 ## Differentiation
 
 - Existing players are either heavy-asset car-battery services (AAA, Batteries911) or large device-resale platforms (Batteries Plus, 转转/Zhuanzhuan). Nobody does light-asset, component-level, certified/traceable matching specifically for consumer electronics.
-- Core B2B value prop: **verified, traceable sourcing** — a large share of aftermarket batteries in the market today are counterfeit/substandard, and this is what ReVolt sells against.
+- Core B2B value prop: **verified, traceable sourcing** — a large share of aftermarket batteries in the market today are counterfeit/substandard, and this is what GreenVolt sells against.
 
 ## Policy tailwinds (positioning, not yet product features)
 
@@ -27,7 +27,7 @@ This repo currently holds a **single-file static demo** (`index.html`) built for
 - Basel Convention 2025 e-waste amendments + EU export bans are closing informal export channels — reinforces demand for compliant domestic channels like this one.
 - Lithium battery transport is regulated under Canada's TDG (Transportation of Dangerous Goods) — anyone on the team handling batteries needs TDG training.
 
-## Financial model — ⚠️ illustrative only, not validated
+## Financial model — illustrative only, not validated
 
 - Blended gross profit per device: ~$38 (revenue ~$59, cashback ~$9, processing/shipping ~$12)
 - Break-even: ~53–61 devices/month depending on fixed costs included

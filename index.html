@@ -1,1321 +1,3243 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReVolt — Cash for dead phones. Every part reused.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --green: #16a34a;
-    --green-deep: #14532d;
-    --green-dark: #166534;
-    --green-mid: #22c55e;
-    --green-pale: #f0fdf4;
-    --green-soft: #dcfce7;
-    --accent: #fbbf24;
-    --ink: #14231b;
-    --muted: #5b6f63;
-    --bg: #fbfdfb;
-    --card: #ffffff;
-    --line: #e4efe8;
-    --radius: 18px;
-    --shadow-sm: 0 2px 8px rgba(20, 83, 45, .06);
-    --shadow-md: 0 10px 30px rgba(20, 83, 45, .10);
-    --shadow-lg: 0 24px 60px rgba(20, 83, 45, .16);
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--ink); background: var(--bg); line-height: 1.65;
-    overflow-x: hidden;
-  }
-  h1, h2, h3, .logo, .amount, .stat b { font-family: 'Sora', 'Inter', sans-serif; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenVolt · Cash for dead phones. Every part reused.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #16a34a;
+        --green-deep: #14532d;
+        --green-dark: #166534;
+        --green-mid: #22c55e;
+        --green-pale: #f0fdf4;
+        --green-soft: #dcfce7;
+        --accent: #fbbf24;
+        --ink: #14231b;
+        --muted: #5b6f63;
+        --bg: #fbfdfb;
+        --card: #ffffff;
+        --line: #e4efe8;
+        --radius: 18px;
+        --shadow-sm: 0 2px 8px rgba(20, 83, 45, 0.06);
+        --shadow-md: 0 10px 30px rgba(20, 83, 45, 0.1);
+        --shadow-lg: 0 24px 60px rgba(20, 83, 45, 0.16);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+        overflow-x: hidden;
+      }
+      h1,
+      h2,
+      h3,
+      .logo,
+      .amount,
+      .stat b {
+        font-family: "Sora", "Inter", sans-serif;
+      }
 
-  /* pages */
-  .page { display: none; }
-  .page.active { display: block; animation: pageIn .45s ease; }
-  @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+      /* pages */
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+        animation: pageIn 0.45s ease;
+      }
+      @keyframes pageIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
 
-  #progress {
-    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
-    background: linear-gradient(90deg, var(--green), var(--green-mid));
-    z-index: 1000; transition: width .1s linear;
-  }
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: linear-gradient(90deg, var(--green), var(--green-mid));
+        z-index: 1000;
+        transition: width 0.1s linear;
+      }
 
-  /* ===== NAV ===== */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 5vw;
-    background: rgba(251,253,251,.85); backdrop-filter: blur(14px);
-    border-bottom: 1px solid transparent;
-    transition: box-shadow .35s ease, border-color .35s ease;
-  }
-  nav.scrolled { box-shadow: var(--shadow-sm); border-color: var(--line); }
-  .logo {
-    font-size: 1.4rem; font-weight: 800; letter-spacing: -.5px;
-    color: var(--green-deep); text-decoration: none; cursor: pointer;
-  }
-  .logo span { color: var(--green); }
-  .logo .bolt { color: var(--accent); }
-  nav .links { display: flex; align-items: center; }
-  nav .links a {
-    margin-left: 26px; text-decoration: none; color: var(--muted);
-    font-weight: 600; font-size: .92rem; position: relative;
-    transition: color .25s; cursor: pointer;
-  }
-  nav .links a:not(.cta)::after {
-    content: ''; position: absolute; left: 0; bottom: -5px; height: 2px; width: 0;
-    background: var(--green); border-radius: 2px; transition: width .3s ease;
-  }
-  nav .links a:not(.cta):hover { color: var(--green-dark); }
-  nav .links a:not(.cta):hover::after { width: 100%; }
-  nav .links a.current { color: var(--green-dark); }
-  nav .links a.current::after { width: 100%; }
-  nav .links a.cta {
-    background: var(--green); color: #fff; padding: 10px 22px; border-radius: 999px;
-    box-shadow: 0 4px 14px rgba(22,163,74,.30);
-    transition: transform .25s ease, box-shadow .25s ease, background .25s;
-  }
-  nav .links a.cta:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(22,163,74,.38); }
-  @media (max-width: 820px) { nav .links a:not(.cta) { display: none; } }
+      /* ===== NAV ===== */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 5vw;
+        background: rgba(251, 253, 251, 0.85);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid transparent;
+        transition:
+          box-shadow 0.35s ease,
+          border-color 0.35s ease;
+      }
+      nav.scrolled {
+        box-shadow: var(--shadow-sm);
+        border-color: var(--line);
+      }
+      .logo {
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--green-deep);
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .logo span {
+        color: var(--green);
+      }
+      .logo .bolt {
+        color: var(--accent);
+      }
+      nav .links {
+        display: flex;
+        align-items: center;
+      }
+      nav .links a {
+        margin-left: 26px;
+        text-decoration: none;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.92rem;
+        position: relative;
+        transition: color 0.25s;
+        cursor: pointer;
+      }
+      nav .links a:not(.cta)::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        height: 2px;
+        width: 0;
+        background: var(--green);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+      }
+      nav .links a:not(.cta):hover {
+        color: var(--green-dark);
+      }
+      nav .links a:not(.cta):hover::after {
+        width: 100%;
+      }
+      nav .links a.current {
+        color: var(--green-dark);
+      }
+      nav .links a.current::after {
+        width: 100%;
+      }
+      nav .links a.cta {
+        background: var(--green);
+        color: #fff;
+        padding: 10px 22px;
+        border-radius: 999px;
+        box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.25s;
+      }
+      nav .links a.cta:hover {
+        background: var(--green-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(22, 163, 74, 0.38);
+      }
+      @media (max-width: 820px) {
+        nav .links a:not(.cta) {
+          display: none;
+        }
+      }
 
-  /* ===== HERO ===== */
-  header {
-    position: relative; padding: 96px 6vw 80px; text-align: center;
-    background: linear-gradient(180deg, var(--green-pale) 0%, var(--bg) 90%);
-    overflow: hidden;
-  }
-  .blob {
-    position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; z-index: 0;
-    animation: drift 16s ease-in-out infinite alternate;
-  }
-  .blob.b1 { width: 480px; height: 480px; background: #bbf7d0; top: -180px; left: -140px; }
-  .blob.b2 { width: 380px; height: 380px; background: #fef3c7; bottom: -160px; right: -100px; animation-delay: -6s; }
-  .blob.b3 { width: 260px; height: 260px; background: #a7f3d0; top: 30%; right: 12%; animation-delay: -11s; opacity: .35; }
-  @keyframes drift {
-    from { transform: translate(0,0) scale(1); }
-    to   { transform: translate(40px, 30px) scale(1.12); }
-  }
-  header > * { position: relative; z-index: 1; }
-  .eyebrow {
-    display: inline-block; background: var(--green-soft); color: var(--green-dark);
-    font-weight: 700; font-size: .82rem; letter-spacing: .06em; text-transform: uppercase;
-    padding: 8px 18px; border-radius: 999px; margin-bottom: 26px;
-    animation: fadeUp .8s ease both;
-  }
-  header h1 {
-    font-size: clamp(2.3rem, 5.6vw, 4rem); font-weight: 800;
-    letter-spacing: -2px; line-height: 1.08;
-    animation: fadeUp .8s ease .1s both;
-  }
-  header h1 em {
-    font-style: normal;
-    background: linear-gradient(120deg, var(--green-dark), var(--green-mid));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  header p.sub {
-    max-width: 640px; margin: 22px auto 36px; font-size: 1.18rem; color: var(--muted);
-    animation: fadeUp .8s ease .2s both;
-  }
-  .hero-btns { animation: fadeUp .8s ease .3s both; }
-  .hero-btns a {
-    display: inline-block; margin: 6px 8px; padding: 16px 34px; border-radius: 999px;
-    font-weight: 700; text-decoration: none; font-size: 1.05rem; cursor: pointer;
-    transition: transform .25s ease, box-shadow .25s ease, background .25s;
-  }
-  .btn-primary { background: var(--green); color: #fff; box-shadow: 0 8px 24px rgba(22,163,74,.32); }
-  .btn-primary:hover { background: var(--green-dark); transform: translateY(-3px); box-shadow: 0 14px 34px rgba(22,163,74,.42); }
-  .btn-ghost { color: var(--green-deep); border: 2px solid var(--green); background: rgba(255,255,255,.6); }
-  .btn-ghost:hover { background: var(--green-soft); transform: translateY(-3px); }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(26px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+      /* ===== HERO ===== */
+      header {
+        position: relative;
+        padding: 96px 6vw 80px;
+        text-align: center;
+        background: linear-gradient(
+          180deg,
+          var(--green-pale) 0%,
+          var(--bg) 90%
+        );
+        overflow: hidden;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(70px);
+        opacity: 0.5;
+        z-index: 0;
+        animation: drift 16s ease-in-out infinite alternate;
+      }
+      .blob.b1 {
+        width: 480px;
+        height: 480px;
+        background: #bbf7d0;
+        top: -180px;
+        left: -140px;
+      }
+      .blob.b2 {
+        width: 380px;
+        height: 380px;
+        background: #fef3c7;
+        bottom: -160px;
+        right: -100px;
+        animation-delay: -6s;
+      }
+      .blob.b3 {
+        width: 260px;
+        height: 260px;
+        background: #a7f3d0;
+        top: 30%;
+        right: 12%;
+        animation-delay: -11s;
+        opacity: 0.35;
+      }
+      @keyframes drift {
+        from {
+          transform: translate(0, 0) scale(1);
+        }
+        to {
+          transform: translate(40px, 30px) scale(1.12);
+        }
+      }
+      header > * {
+        position: relative;
+        z-index: 1;
+      }
+      .eyebrow {
+        display: inline-block;
+        background: var(--green-soft);
+        color: var(--green-dark);
+        font-weight: 700;
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 8px 18px;
+        border-radius: 999px;
+        margin-bottom: 26px;
+        animation: fadeUp 0.8s ease both;
+      }
+      header h1 {
+        font-size: clamp(2.3rem, 5.6vw, 4rem);
+        font-weight: 800;
+        letter-spacing: -2px;
+        line-height: 1.08;
+        animation: fadeUp 0.8s ease 0.1s both;
+      }
+      header h1 em {
+        font-style: normal;
+        background: linear-gradient(
+          120deg,
+          var(--green-dark),
+          var(--green-mid)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      header p.sub {
+        max-width: 640px;
+        margin: 22px auto 36px;
+        font-size: 1.18rem;
+        color: var(--muted);
+        animation: fadeUp 0.8s ease 0.2s both;
+      }
+      .hero-btns {
+        animation: fadeUp 0.8s ease 0.3s both;
+      }
+      .hero-btns a {
+        display: inline-block;
+        margin: 6px 8px;
+        padding: 16px 34px;
+        border-radius: 999px;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.25s;
+      }
+      .btn-primary {
+        background: var(--green);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(22, 163, 74, 0.32);
+      }
+      .btn-primary:hover {
+        background: var(--green-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 14px 34px rgba(22, 163, 74, 0.42);
+      }
+      .btn-ghost {
+        color: var(--green-deep);
+        border: 2px solid var(--green);
+        background: rgba(255, 255, 255, 0.6);
+      }
+      .btn-ghost:hover {
+        background: var(--green-soft);
+        transform: translateY(-3px);
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(26px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-  .hero-stats {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 60px;
-    animation: fadeUp .8s ease .45s both;
-  }
-  .stat {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 22px 30px; min-width: 185px; box-shadow: var(--shadow-sm);
-    transition: transform .3s ease, box-shadow .3s ease;
-  }
-  .stat:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-  .stat b { display: block; font-size: 1.9rem; font-weight: 800; color: var(--green-deep); letter-spacing: -1px; }
-  .stat span { font-size: .84rem; color: var(--muted); }
+      .hero-stats {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 60px;
+        animation: fadeUp 0.8s ease 0.45s both;
+      }
+      .stat {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px 30px;
+        min-width: 185px;
+        box-shadow: var(--shadow-sm);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .stat:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+      }
+      .stat b {
+        display: block;
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: var(--green-deep);
+        letter-spacing: -1px;
+      }
+      .stat span {
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
 
-  /* ===== page hero (subpages) ===== */
-  .page-hero {
-    padding: 70px 6vw 50px; text-align: center;
-    background: linear-gradient(180deg, var(--green-pale) 0%, var(--bg) 100%);
-  }
-  .page-hero h1 { font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1.5px; }
-  .page-hero h1 em {
-    font-style: normal;
-    background: linear-gradient(120deg, var(--green-dark), var(--green-mid));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .page-hero p { max-width: 620px; margin: 14px auto 0; color: var(--muted); font-size: 1.1rem; }
+      /* ===== page hero (subpages) ===== */
+      .page-hero {
+        padding: 70px 6vw 50px;
+        text-align: center;
+        background: linear-gradient(
+          180deg,
+          var(--green-pale) 0%,
+          var(--bg) 100%
+        );
+      }
+      .page-hero h1 {
+        font-size: clamp(1.9rem, 4vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+      }
+      .page-hero h1 em {
+        font-style: normal;
+        background: linear-gradient(
+          120deg,
+          var(--green-dark),
+          var(--green-mid)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .page-hero p {
+        max-width: 620px;
+        margin: 14px auto 0;
+        color: var(--muted);
+        font-size: 1.1rem;
+      }
 
-  /* table of contents card */
-  .toc {
-    max-width: 1120px; margin: 34px auto 0; padding: 0 6vw;
-  }
-  .toc .inner {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 20px 26px; box-shadow: var(--shadow-sm);
-    display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center;
-  }
-  .toc .label { font-weight: 800; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-right: 6px; }
-  .toc a {
-    color: var(--muted); text-decoration: none; font-weight: 600; font-size: .92rem;
-    transition: color .2s;
-  }
-  .toc a:hover { color: var(--green-dark); }
-  .toc a::before { content: '↓ '; color: var(--green-mid); }
+      /* table of contents card */
+      .toc {
+        max-width: 1120px;
+        margin: 34px auto 0;
+        padding: 0 6vw;
+      }
+      .toc .inner {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 26px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 26px;
+        align-items: center;
+      }
+      .toc .label {
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-right: 6px;
+      }
+      .toc a {
+        color: var(--muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.92rem;
+        transition: color 0.2s;
+      }
+      .toc a:hover {
+        color: var(--green-dark);
+      }
+      .toc a::before {
+        content: "↓ ";
+        color: var(--green-mid);
+      }
 
-  /* ===== SECTIONS ===== */
-  section { padding: 80px 6vw; max-width: 1120px; margin: 0 auto; }
-  .kicker {
-    color: var(--green); font-weight: 700; font-size: .82rem;
-    letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px;
-  }
-  h2.sec { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
-  p.sec-sub { color: var(--muted); margin-bottom: 44px; max-width: 660px; font-size: 1.05rem; }
+      /* ===== SECTIONS ===== */
+      section {
+        padding: 80px 6vw;
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+      .kicker {
+        color: var(--green);
+        font-weight: 700;
+        font-size: 0.82rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      h2.sec {
+        font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 10px;
+      }
+      p.sec-sub {
+        color: var(--muted);
+        margin-bottom: 44px;
+        max-width: 660px;
+        font-size: 1.05rem;
+      }
 
-  .reveal { opacity: 0; transform: translateY(36px); transition: opacity .7s ease, transform .7s cubic-bezier(.22,.8,.35,1); }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; }
-  .reveal.d3 { transition-delay: .24s; } .reveal.d4 { transition-delay: .32s; }
+      .reveal {
+        opacity: 0;
+        transform: translateY(36px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s cubic-bezier(0.22, 0.8, 0.35, 1);
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal.d1 {
+        transition-delay: 0.08s;
+      }
+      .reveal.d2 {
+        transition-delay: 0.16s;
+      }
+      .reveal.d3 {
+        transition-delay: 0.24s;
+      }
+      .reveal.d4 {
+        transition-delay: 0.32s;
+      }
+      .reveal.d5 {
+        transition-delay: 0.4s;
+      }
 
-  /* ===== HOW IT WORKS (cards) ===== */
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; }
-  .step {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 34px 30px; box-shadow: var(--shadow-sm); position: relative;
-    transition: transform .3s ease, box-shadow .3s ease, border-color .3s;
-  }
-  .step:hover { transform: translateY(-7px); box-shadow: var(--shadow-md); border-color: #c9e8d5; }
-  .step .num {
-    width: 44px; height: 44px; border-radius: 14px;
-    background: linear-gradient(135deg, var(--green), var(--green-mid));
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 1.1rem; margin-bottom: 18px;
-    box-shadow: 0 6px 14px rgba(22,163,74,.28);
-  }
-  .step h3 { font-size: 1.12rem; margin-bottom: 8px; font-weight: 700; }
-  .step p { font-size: .94rem; color: var(--muted); }
-  .step .more { margin-top: 12px; font-size: .88rem; font-weight: 700; color: var(--green); text-decoration: none; cursor: pointer; }
-  .step .more:hover { color: var(--green-dark); }
+      /* ===== HOW IT WORKS (cards) ===== */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 22px;
+      }
+      .step {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 34px 30px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease,
+          border-color 0.3s;
+      }
+      .step:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-md);
+        border-color: #c9e8d5;
+      }
+      .step .num {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--green), var(--green-mid));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 14px rgba(22, 163, 74, 0.28);
+      }
+      .step h3 {
+        font-size: 1.12rem;
+        margin-bottom: 8px;
+        font-weight: 700;
+      }
+      .step p {
+        font-size: 0.94rem;
+        color: var(--muted);
+      }
+      .step .more {
+        margin-top: 12px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--green);
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .step .more:hover {
+        color: var(--green-dark);
+      }
 
-  /* detail blocks (subpages) */
-  .detail {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 34px; box-shadow: var(--shadow-sm); margin-bottom: 22px;
-    display: flex; gap: 22px; align-items: flex-start;
-  }
-  @media (max-width: 680px) { .detail { flex-direction: column; } }
-  .detail .dnum {
-    flex-shrink: 0; width: 54px; height: 54px; border-radius: 16px;
-    background: linear-gradient(135deg, var(--green), var(--green-mid)); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;
-    font-family: 'Sora', sans-serif; box-shadow: 0 6px 14px rgba(22,163,74,.28);
-  }
-  .detail .dico {
-    flex-shrink: 0; width: 54px; height: 54px; border-radius: 16px; background: var(--green-pale);
-    display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
-  }
-  .detail h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -.4px; }
-  .detail p { color: var(--muted); font-size: .97rem; margin-bottom: 10px; }
-  .detail p:last-child { margin-bottom: 0; }
-  .detail ul { margin: 8px 0 10px 20px; color: var(--muted); font-size: .95rem; }
-  .detail ul li { margin-bottom: 6px; }
-  .detail b { color: var(--green-deep); }
-  .tag {
-    display: inline-block; background: var(--green-soft); color: var(--green-dark);
-    font-size: .78rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; margin-bottom: 10px;
-  }
+      /* detail blocks (subpages) */
+      .detail {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 34px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 22px;
+        display: flex;
+        gap: 22px;
+        align-items: flex-start;
+      }
+      @media (max-width: 680px) {
+        .detail {
+          flex-direction: column;
+        }
+      }
+      .detail .dnum {
+        flex-shrink: 0;
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--green), var(--green-mid));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.25rem;
+        font-family: "Sora", sans-serif;
+        box-shadow: 0 6px 14px rgba(22, 163, 74, 0.28);
+      }
+      .detail .dico {
+        flex-shrink: 0;
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: var(--green-pale);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+      }
+      .detail h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.4px;
+      }
+      .detail p {
+        color: var(--muted);
+        font-size: 0.97rem;
+        margin-bottom: 10px;
+      }
+      .detail p:last-child {
+        margin-bottom: 0;
+      }
+      .detail ul,
+      .detail ol {
+        margin: 8px 0 10px 20px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .detail ul li,
+      .detail ol li {
+        margin-bottom: 6px;
+      }
+      .detail b {
+        color: var(--green-deep);
+      }
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        align-items: stretch;
+      }
+      @media (max-width: 780px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .compare-grid .detail {
+        margin-bottom: 0;
+      }
+      .tag {
+        display: inline-block;
+        background: var(--green-soft);
+        color: var(--green-dark);
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 3px 12px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+      }
 
-  /* tables */
-  .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
-  table.tbl { width: 100%; border-collapse: collapse; background: var(--card); font-size: .93rem; }
-  .tbl th {
-    background: var(--green-deep); color: #fff; text-align: left; padding: 14px 18px;
-    font-family: 'Sora', sans-serif; font-weight: 700; font-size: .85rem; letter-spacing: .03em;
-  }
-  .tbl td { padding: 14px 18px; border-top: 1px solid var(--line); color: var(--muted); vertical-align: top; }
-  .tbl td:first-child { font-weight: 700; color: var(--ink); white-space: nowrap; }
-  .tbl tr { transition: background .2s; }
-  .tbl tbody tr:hover { background: var(--green-pale); }
-  .tbl .val { color: var(--green-dark); font-weight: 700; }
+      /* tables */
+      .tbl-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-sm);
+      }
+      table.tbl {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        font-size: 0.93rem;
+      }
+      .tbl th {
+        background: var(--green-deep);
+        color: #fff;
+        text-align: left;
+        padding: 14px 18px;
+        font-family: "Sora", sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.03em;
+      }
+      .tbl td {
+        padding: 14px 18px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        vertical-align: top;
+      }
+      .tbl td:first-child {
+        font-weight: 700;
+        color: var(--ink);
+        white-space: nowrap;
+      }
+      .tbl tr {
+        transition: background 0.2s;
+      }
+      .tbl tbody tr:hover {
+        background: var(--green-pale);
+      }
+      .tbl .val {
+        color: var(--green-dark);
+        font-weight: 700;
+      }
 
-  /* FAQ */
-  details.faq {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 0; margin-bottom: 12px; box-shadow: var(--shadow-sm); overflow: hidden;
-    transition: box-shadow .25s;
-  }
-  details.faq:hover { box-shadow: var(--shadow-md); }
-  details.faq summary {
-    cursor: pointer; font-weight: 700; padding: 18px 22px; list-style: none;
-    display: flex; justify-content: space-between; align-items: center; font-size: .98rem;
-  }
-  details.faq summary::-webkit-details-marker { display: none; }
-  details.faq summary::after { content: '+'; color: var(--green); font-size: 1.4rem; font-weight: 600; transition: transform .3s; }
-  details.faq[open] summary::after { transform: rotate(45deg); }
-  details.faq .body { padding: 0 22px 18px; color: var(--muted); font-size: .94rem; }
+      /* FAQ */
+      details.faq {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0;
+        margin-bottom: 12px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        transition: box-shadow 0.25s;
+      }
+      details.faq:hover {
+        box-shadow: var(--shadow-md);
+      }
+      details.faq summary {
+        cursor: pointer;
+        font-weight: 700;
+        padding: 18px 22px;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.98rem;
+      }
+      details.faq summary::-webkit-details-marker {
+        display: none;
+      }
+      details.faq summary::after {
+        content: "+";
+        color: var(--green);
+        font-size: 1.4rem;
+        font-weight: 600;
+        transition: transform 0.3s;
+      }
+      details.faq[open] summary::after {
+        transform: rotate(45deg);
+      }
+      details.faq .body {
+        padding: 0 22px 18px;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
 
-  /* ===== QUOTE ===== */
-  .quote-wrap {
-    background: linear-gradient(135deg, var(--green-deep) 0%, #1a6b3c 100%);
-    border-radius: 28px; color: #fff; padding: 64px 6vw;
-    max-width: 1120px; margin: 0 auto; position: relative; overflow: hidden;
-    box-shadow: var(--shadow-lg);
-  }
-  .quote-wrap::before {
-    content: ''; position: absolute; width: 420px; height: 420px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(74,222,128,.25), transparent 70%);
-    top: -160px; right: -120px;
-  }
-  .quote-wrap .kicker { color: #86efac; }
-  .quote-wrap h2.sec { color: #fff; }
-  .quote-wrap p.sec-sub { color: #a7d4ba; }
-  .quote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: start; position: relative; }
-  @media (max-width: 780px) { .quote-grid { grid-template-columns: 1fr; } }
-  .qform label { display: block; font-weight: 700; font-size: .88rem; margin: 20px 0 8px; color: #bfe8cf; letter-spacing: .02em; }
-  .qform select {
-    width: 100%; padding: 14px 16px; border-radius: 12px; border: none; font-size: 1rem;
-    background: #fff; color: var(--ink); font-family: inherit; cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0,0,0,.12);
-  }
-  .qform select:focus { outline: 3px solid var(--green-mid); }
-  .qform textarea {
-    width: 100%; padding: 13px 16px; border-radius: 12px; border: none; font-size: .96rem;
-    background: #fff; color: var(--ink); font-family: inherit; resize: vertical; min-height: 74px;
-    box-shadow: 0 3px 10px rgba(0,0,0,.12);
-  }
-  .qform textarea:focus { outline: 3px solid var(--green-mid); }
-  .qform textarea::placeholder { color: #9aab9f; }
-  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
-  .chip {
-    padding: 11px 18px; border-radius: 999px; border: 1.5px solid rgba(134,239,172,.4);
-    color: #cdeeda; cursor: pointer; font-weight: 600; font-size: .92rem;
-    background: rgba(255,255,255,.06); font-family: inherit;
-    transition: all .25s ease;
-  }
-  .chip:hover { border-color: #86efac; background: rgba(255,255,255,.12); transform: translateY(-2px); }
-  .chip.active {
-    background: var(--accent); border-color: var(--accent); color: var(--green-deep);
-    box-shadow: 0 6px 16px rgba(251,191,36,.35); transform: translateY(-2px);
-  }
-  .quote-result {
-    background: #fff; color: var(--ink); border-radius: 22px; padding: 38px 34px; text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,.22);
-  }
-  .quote-result .label { color: var(--muted); font-size: .92rem; font-weight: 600; letter-spacing: .03em; }
-  .quote-result .amount {
-    font-size: 4rem; font-weight: 800; letter-spacing: -2.5px; line-height: 1.15;
-    background: linear-gradient(120deg, var(--green-dark), var(--green-mid));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .quote-result .amount.pop { animation: pop .35s ease; }
-  @keyframes pop { 40% { transform: scale(1.12); } }
-  .quote-result .impact {
-    margin-top: 22px; padding-top: 20px; border-top: 1px dashed var(--line);
-    font-size: .92rem; color: var(--muted); text-align: left;
-  }
-  .quote-result .impact b { color: var(--green-deep); }
-  .quote-result button {
-    margin-top: 24px; width: 100%; padding: 16px; border: none; border-radius: 999px;
-    background: var(--green); color: #fff; font-size: 1.05rem; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    box-shadow: 0 8px 22px rgba(22,163,74,.32);
-    transition: transform .25s ease, background .25s, box-shadow .25s;
-  }
-  .quote-result button:hover { background: var(--green-dark); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(22,163,74,.42); }
+      /* ===== QUOTE ===== */
+      .quote-wrap {
+        background: linear-gradient(135deg, var(--green-deep) 0%, #1a6b3c 100%);
+        border-radius: 28px;
+        color: #fff;
+        padding: 64px 6vw;
+        max-width: 1120px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+      }
+      .quote-wrap::before {
+        content: "";
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(74, 222, 128, 0.25),
+          transparent 70%
+        );
+        top: -160px;
+        right: -120px;
+      }
+      .quote-wrap .kicker {
+        color: #86efac;
+      }
+      .quote-wrap h2.sec {
+        color: #fff;
+      }
+      .quote-wrap p.sec-sub {
+        color: #a7d4ba;
+      }
+      .quote-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 44px;
+        align-items: start;
+        position: relative;
+      }
+      @media (max-width: 780px) {
+        .quote-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .qform label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.88rem;
+        margin: 20px 0 8px;
+        color: #bfe8cf;
+        letter-spacing: 0.02em;
+      }
+      .qform select {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: none;
+        font-size: 1rem;
+        background: #fff;
+        color: var(--ink);
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      }
+      .qform select:focus {
+        outline: 3px solid var(--green-mid);
+      }
+      .qform input[type="text"] {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: none;
+        font-size: 1rem;
+        background: #fff;
+        color: var(--ink);
+        font-family: inherit;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      }
+      .qform input[type="text"]:focus {
+        outline: 3px solid var(--green-mid);
+      }
+      .qform input[type="text"]::placeholder {
+        color: #9aab9f;
+      }
+      .qform textarea {
+        width: 100%;
+        padding: 13px 16px;
+        border-radius: 12px;
+        border: none;
+        font-size: 0.96rem;
+        background: #fff;
+        color: var(--ink);
+        font-family: inherit;
+        resize: vertical;
+        min-height: 74px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      }
+      .qform textarea:focus {
+        outline: 3px solid var(--green-mid);
+      }
+      .qform textarea::placeholder {
+        color: #9aab9f;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+      }
+      .chip {
+        padding: 11px 18px;
+        border-radius: 999px;
+        border: 1.5px solid rgba(134, 239, 172, 0.4);
+        color: #cdeeda;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.92rem;
+        background: rgba(255, 255, 255, 0.06);
+        font-family: inherit;
+        transition: all 0.25s ease;
+      }
+      .chip:hover {
+        border-color: #86efac;
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+      }
+      .chip.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--green-deep);
+        box-shadow: 0 6px 16px rgba(251, 191, 36, 0.35);
+        transform: translateY(-2px);
+      }
+      .quote-result {
+        background: #fff;
+        color: var(--ink);
+        border-radius: 22px;
+        padding: 38px 34px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+      }
+      .quote-result .label {
+        color: var(--muted);
+        font-size: 0.92rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      .quote-result .amount {
+        font-size: 4rem;
+        font-weight: 800;
+        letter-spacing: -2.5px;
+        line-height: 1.15;
+        background: linear-gradient(
+          120deg,
+          var(--green-dark),
+          var(--green-mid)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .quote-result .amount.pop {
+        animation: pop 0.35s ease;
+      }
+      @keyframes pop {
+        40% {
+          transform: scale(1.12);
+        }
+      }
+      .quote-result .impact {
+        margin-top: 22px;
+        padding-top: 20px;
+        border-top: 1px dashed var(--line);
+        font-size: 0.92rem;
+        color: var(--muted);
+        text-align: left;
+      }
+      .quote-result .impact b {
+        color: var(--green-deep);
+      }
+      .quote-result .estimate-note {
+        margin-top: 10px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .quote-result button {
+        margin-top: 24px;
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 8px 22px rgba(22, 163, 74, 0.32);
+        transition:
+          transform 0.25s ease,
+          background 0.25s,
+          box-shadow 0.25s;
+      }
+      .quote-result button:hover {
+        background: var(--green-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(22, 163, 74, 0.42);
+      }
+      .quote-result button:disabled {
+        background: #b9cfc1;
+        box-shadow: none;
+        cursor: not-allowed;
+        transform: none;
+      }
 
-  /* ===== JOURNEY (home cards) ===== */
-  .journey { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
-  @media (max-width: 760px) { .journey { grid-template-columns: 1fr; } }
-  .jcard {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 22px 24px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
-    display: flex; gap: 16px; align-items: flex-start;
-    transition: transform .3s ease, box-shadow .3s ease;
-  }
-  .jcard::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
-    background: var(--jc, var(--green));
-    transform: scaleX(0); transform-origin: left; transition: transform .5s ease .15s;
-  }
-  .jcard.visible::before { transform: scaleX(1); }
-  .jcard:hover { transform: translateY(-7px); box-shadow: var(--shadow-md); }
-  .jcard.j1 { --jc: linear-gradient(90deg,#16a34a,#4ade80); }
-  .jcard.j2 { --jc: linear-gradient(90deg,#0d9488,#2dd4bf); }
-  .jcard.j3 { --jc: linear-gradient(90deg,#f59e0b,#fbbf24); }
-  .jcard.j4 { --jc: linear-gradient(90deg,#64748b,#94a3b8); }
-  .jcard .ico {
-    font-size: 1.5rem; flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px;
-    background: var(--green-pale); display: flex; align-items: center; justify-content: center;
-  }
-  .jcard .pct { font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); }
-  .jcard h3 { font-size: 1.05rem; margin: 2px 0 4px; font-weight: 700; }
-  .jcard p { font-size: .9rem; color: var(--muted); line-height: 1.5; }
-  .zero {
-    margin-top: 20px; text-align: center;
-    background: linear-gradient(120deg, var(--green-soft), #d1fae5);
-    border-radius: var(--radius); padding: 24px; font-weight: 700; color: var(--green-deep);
-    font-size: 1.06rem; box-shadow: var(--shadow-sm);
-  }
+      /* ===== JOURNEY (home cards) ===== */
+      .journey {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 16px;
+      }
+      @media (max-width: 760px) {
+        .journey {
+          grid-template-columns: 1fr;
+        }
+      }
+      .jcard {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px 24px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .jcard::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--jc, var(--green));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s ease 0.15s;
+      }
+      .jcard.visible::before {
+        transform: scaleX(1);
+      }
+      .jcard:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-md);
+      }
+      .jcard.j1 {
+        --jc: linear-gradient(90deg, #16a34a, #4ade80);
+      }
+      .jcard.j2 {
+        --jc: linear-gradient(90deg, #0d9488, #2dd4bf);
+      }
+      .jcard.j3 {
+        --jc: linear-gradient(90deg, #f59e0b, #fbbf24);
+      }
+      .jcard.j4 {
+        --jc: linear-gradient(90deg, #64748b, #94a3b8);
+      }
+      .jcard.j5 {
+        --jc: linear-gradient(90deg, #b91c1c, #ef4444);
+      }
+      .jcard .ico {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: var(--green-pale);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .jcard .pct {
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--green);
+      }
+      .jcard h3 {
+        font-size: 1.05rem;
+        margin: 2px 0 4px;
+        font-weight: 700;
+      }
+      .jcard p {
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .zero {
+        margin-top: 20px;
+        text-align: center;
+        background: linear-gradient(120deg, var(--green-soft), #d1fae5);
+        border-radius: var(--radius);
+        padding: 24px;
+        font-weight: 700;
+        color: var(--green-deep);
+        font-size: 1.06rem;
+        box-shadow: var(--shadow-sm);
+      }
 
-  /* ===== WHY ===== */
-  .why { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
-  @media (max-width: 760px) { .why { grid-template-columns: 1fr; } }
-  .why .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 22px 24px; box-shadow: var(--shadow-sm);
-    display: flex; gap: 16px; align-items: flex-start;
-    transition: transform .3s ease, box-shadow .3s ease, border-color .3s;
-  }
-  .why .card:hover { transform: translateY(-7px); box-shadow: var(--shadow-md); border-color: #c9e8d5; }
-  .why .card .ic {
-    flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; background: var(--green-soft);
-    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-  }
-  .why .card h3 { margin: 0 0 4px; font-size: 1.05rem; font-weight: 700; }
-  .why .card p { font-size: .92rem; color: var(--muted); line-height: 1.5; }
+      /* ===== WHY ===== */
+      .why {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 16px;
+      }
+      @media (max-width: 760px) {
+        .why {
+          grid-template-columns: 1fr;
+        }
+      }
+      .why .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px 24px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease,
+          border-color 0.3s;
+      }
+      .why .card:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-md);
+        border-color: #c9e8d5;
+      }
+      .why .card .ic {
+        flex-shrink: 0;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: var(--green-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+      .why .card h3 {
+        margin: 0 0 4px;
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .why .card p {
+        font-size: 0.92rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
 
-  /* ===== values (about) ===== */
-  .values { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-  .values .vcard {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 28px; box-shadow: var(--shadow-sm); border-top: 4px solid var(--green);
-    transition: transform .3s ease, box-shadow .3s ease;
-  }
-  .values .vcard:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
-  .values .vcard h3 { font-size: 1.05rem; margin-bottom: 6px; }
-  .values .vcard p { font-size: .92rem; color: var(--muted); }
+      /* ===== values (about) ===== */
+      .values {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+      .values .vcard {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow: var(--shadow-sm);
+        border-top: 4px solid var(--green);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .values .vcard:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-md);
+      }
+      .values .vcard h3 {
+        font-size: 1.05rem;
+        margin-bottom: 6px;
+      }
+      .values .vcard p {
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
 
-  .team { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-  .team .member {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 26px; text-align: center; box-shadow: var(--shadow-sm);
-    transition: transform .3s ease, box-shadow .3s ease;
-  }
-  .team .member:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
-  .team .avatar {
-    width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 12px;
-    background: linear-gradient(135deg, var(--green-soft), #bbf7d0);
-    display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
-  }
-  .team h3 { font-size: 1rem; }
-  .team p { font-size: .84rem; color: var(--muted); }
+      .team {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+      .team .member {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .team .member:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-md);
+      }
+      .team .avatar {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        margin: 0 auto 12px;
+        background: linear-gradient(135deg, var(--green-soft), #bbf7d0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.7rem;
+      }
+      .team h3 {
+        font-size: 1rem;
+      }
+      .team p {
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
 
-  /* ===== CTA BAND ===== */
-  .band { text-align: center; max-width: 1120px; margin: 0 auto; padding: 0 6vw 90px; }
-  .band .inner {
-    background: linear-gradient(135deg, var(--green-deep), #1a6b3c);
-    border-radius: 28px; padding: 64px 8vw; color: #fff;
-    box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
-  }
-  .band .inner::after {
-    content: '♻️'; position: absolute; font-size: 11rem; opacity: .08;
-    right: -20px; bottom: -40px; transform: rotate(-12deg);
-  }
-  .band h2 { font-size: clamp(1.6rem, 3.4vw, 2.4rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-  .band p { color: #a7d4ba; margin-bottom: 30px; font-size: 1.05rem; }
-  .band a {
-    display: inline-block; background: var(--accent); color: var(--green-deep);
-    font-weight: 800; text-decoration: none; padding: 16px 40px; border-radius: 999px;
-    font-size: 1.08rem; box-shadow: 0 10px 26px rgba(0,0,0,.25); cursor: pointer;
-    transition: transform .25s ease, box-shadow .25s ease;
-  }
-  .band a:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 16px 36px rgba(0,0,0,.3); }
+      /* ===== CTA BAND ===== */
+      .band {
+        text-align: center;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 6vw 90px;
+      }
+      .band .inner {
+        background: linear-gradient(135deg, var(--green-deep), #1a6b3c);
+        border-radius: 28px;
+        padding: 64px 8vw;
+        color: #fff;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+      }
+      .band h2 {
+        font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 12px;
+      }
+      .band p {
+        color: #a7d4ba;
+        margin-bottom: 30px;
+        font-size: 1.05rem;
+      }
+      .band a {
+        display: inline-block;
+        background: var(--accent);
+        color: var(--green-deep);
+        font-weight: 800;
+        text-decoration: none;
+        padding: 16px 40px;
+        border-radius: 999px;
+        font-size: 1.08rem;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      .band a:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+      }
 
-  /* ===== SELL FLOW ===== */
-  .stepper {
-    display: flex; justify-content: center; gap: 0; max-width: 640px; margin: 30px auto 0; padding: 0 6vw;
-  }
-  .stepper .st { display: flex; align-items: center; }
-  .stepper .dot {
-    width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line);
-    background: var(--card); color: var(--muted); font-weight: 800;
-    display: flex; align-items: center; justify-content: center; font-size: .95rem;
-    transition: all .3s ease; font-family: 'Sora', sans-serif;
-  }
-  .stepper .st.active .dot { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(22,163,74,.3); }
-  .stepper .st.done .dot { background: var(--green-soft); border-color: var(--green-mid); color: var(--green-dark); }
-  .stepper .lbl { margin: 0 14px 0 10px; font-size: .88rem; font-weight: 700; color: var(--muted); }
-  .stepper .st.active .lbl { color: var(--green-dark); }
-  .stepper .bar2 { width: 46px; height: 2px; background: var(--line); margin-right: 14px; }
-  @media (max-width: 640px) { .stepper .lbl { display: none; } .stepper .bar2 { width: 24px; } }
+      /* ===== SELL FLOW ===== */
+      .stepper {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        max-width: 640px;
+        margin: 30px auto 0;
+        padding: 0 6vw;
+      }
+      .stepper .st {
+        display: flex;
+        align-items: center;
+      }
+      .stepper .dot {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        background: var(--card);
+        color: var(--muted);
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: "Sora", sans-serif;
+      }
+      .stepper .st.active .dot {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3);
+      }
+      .stepper .st.done .dot {
+        background: var(--green-soft);
+        border-color: var(--green-mid);
+        color: var(--green-dark);
+      }
+      .stepper .lbl {
+        margin: 0 14px 0 10px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .stepper .st.active .lbl {
+        color: var(--green-dark);
+      }
+      .stepper .bar2 {
+        width: 46px;
+        height: 2px;
+        background: var(--line);
+        margin-right: 14px;
+      }
+      @media (max-width: 640px) {
+        .stepper .lbl {
+          display: none;
+        }
+        .stepper .bar2 {
+          width: 24px;
+        }
+      }
 
-  .sell-panel { display: none; max-width: 760px; margin: 0 auto; }
-  .sell-panel.active { display: block; animation: pageIn .4s ease; }
+      .sell-panel {
+        display: none;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+      .sell-panel.active {
+        display: block;
+        animation: pageIn 0.4s ease;
+      }
 
-  .qsummary {
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    background: linear-gradient(120deg, var(--green-soft), #d1fae5);
-    border-radius: var(--radius); padding: 18px 24px; margin-bottom: 26px;
-    font-weight: 700; color: var(--green-deep); flex-wrap: wrap;
-  }
-  .qsummary .amt { font-family: 'Sora', sans-serif; font-size: 1.6rem; font-weight: 800; }
+      .qsummary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        background: linear-gradient(120deg, var(--green-soft), #d1fae5);
+        border-radius: var(--radius);
+        padding: 18px 24px;
+        margin-bottom: 26px;
+        font-weight: 700;
+        color: var(--green-deep);
+        flex-wrap: wrap;
+      }
+      .qsummary .amt {
+        font-family: "Sora", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 800;
+      }
 
-  .dropzone {
-    border: 2.5px dashed #b8dcc6; border-radius: var(--radius); background: var(--green-pale);
-    padding: 44px 24px; text-align: center; cursor: pointer;
-    transition: border-color .25s, background .25s, transform .2s;
-  }
-  .dropzone:hover { border-color: var(--green); background: var(--green-soft); transform: translateY(-2px); }
-  .dropzone .dzico { font-size: 2.4rem; margin-bottom: 8px; }
-  .dropzone h3 { font-size: 1.05rem; margin-bottom: 4px; }
-  .dropzone p { font-size: .88rem; color: var(--muted); }
-  .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 18px; }
-  .thumb {
-    position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1;
-    border: 1px solid var(--line); box-shadow: var(--shadow-sm); animation: pageIn .35s ease;
-  }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb .rm {
-    position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%;
-    background: rgba(0,0,0,.55); color: #fff; border: none; cursor: pointer; font-size: .8rem;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .photo-tips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .photo-tips span {
-    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
-    padding: 6px 14px; font-size: .82rem; color: var(--muted); font-weight: 600;
-  }
-  .photo-tips span.got { background: var(--green-soft); border-color: var(--green-mid); color: var(--green-dark); }
+      .dropzone {
+        border: 2.5px dashed #b8dcc6;
+        border-radius: var(--radius);
+        background: var(--green-pale);
+        padding: 44px 24px;
+        text-align: center;
+        cursor: pointer;
+        transition:
+          border-color 0.25s,
+          background 0.25s,
+          transform 0.2s;
+      }
+      .dropzone:hover {
+        border-color: var(--green);
+        background: var(--green-soft);
+        transform: translateY(-2px);
+      }
+      .dropzone .dzico {
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+      }
+      .qform .dropzone {
+        padding: 28px 20px;
+        margin-bottom: 6px;
+      }
+      .qform .dzico {
+        font-size: 2rem;
+        margin-bottom: 6px;
+      }
+      .dropzone h3 {
+        font-size: 1.05rem;
+        margin-bottom: 4px;
+        color: var(--green-deep);
+      }
+      .dropzone p {
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+      .thumbs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .thumb {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 1;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-sm);
+        animation: pageIn 0.35s ease;
+      }
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .thumb .rm {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .photo-tips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .photo-tips span {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .photo-tips span.got {
+        background: var(--green-soft);
+        border-color: var(--green-mid);
+        color: var(--green-dark);
+      }
 
-  .sform { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-sm); }
-  .sform .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 560px) { .sform .row { grid-template-columns: 1fr; } }
-  .sform label { display: block; font-weight: 700; font-size: .85rem; margin: 14px 0 6px; color: var(--green-deep); }
-  .sform input {
-    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--line);
-    font-size: .96rem; font-family: inherit; background: var(--bg); transition: border-color .2s, box-shadow .2s;
-  }
-  .sform input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.14); }
-  .payx { display: flex; gap: 9px; flex-wrap: wrap; }
-  .payx .chip { border-color: var(--line); color: var(--muted); background: var(--bg); }
-  .payx .chip.active { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 6px 14px rgba(22,163,74,.28); }
+      .sform {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 30px;
+        box-shadow: var(--shadow-sm);
+      }
+      .sform .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      @media (max-width: 560px) {
+        .sform .row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .sform label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin: 14px 0 6px;
+        color: var(--green-deep);
+      }
+      .sform input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1.5px solid var(--line);
+        font-size: 0.96rem;
+        font-family: inherit;
+        background: var(--bg);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+      .sform input:focus {
+        outline: none;
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.14);
+      }
+      .payx {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .payx .chip {
+        border-color: var(--line);
+        color: var(--muted);
+        background: var(--bg);
+      }
+      .payx .chip.active {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(22, 163, 74, 0.28);
+      }
 
-  .flow-btns { display: flex; justify-content: space-between; gap: 12px; margin-top: 26px; }
-  .fbtn {
-    padding: 14px 30px; border-radius: 999px; font-weight: 700; font-size: 1rem;
-    cursor: pointer; border: none; font-family: inherit;
-    transition: transform .22s ease, box-shadow .22s ease, background .22s;
-  }
-  .fbtn.next { background: var(--green); color: #fff; box-shadow: 0 8px 20px rgba(22,163,74,.3); margin-left: auto; }
-  .fbtn.next:hover { background: var(--green-dark); transform: translateY(-2px); }
-  .fbtn.next:disabled { background: #b9cfc1; box-shadow: none; cursor: not-allowed; transform: none; }
-  .fbtn.back2 { background: transparent; color: var(--muted); border: 1.5px solid var(--line); }
-  .fbtn.back2:hover { color: var(--green-dark); border-color: var(--green-mid); }
+      .flow-btns {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 26px;
+      }
+      .fbtn {
+        padding: 14px 30px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition:
+          transform 0.22s ease,
+          box-shadow 0.22s ease,
+          background 0.22s;
+      }
+      .fbtn.next {
+        background: var(--green);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+        margin-left: auto;
+      }
+      .fbtn.next:hover {
+        background: var(--green-dark);
+        transform: translateY(-2px);
+      }
+      .fbtn.next:disabled {
+        background: #b9cfc1;
+        box-shadow: none;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .fbtn.back2 {
+        background: transparent;
+        color: var(--muted);
+        border: 1.5px solid var(--line);
+      }
+      .fbtn.back2:hover {
+        color: var(--green-dark);
+        border-color: var(--green-mid);
+      }
 
-  /* shipping label */
-  .success-blip { text-align: center; margin-bottom: 24px; }
-  .success-blip .big { font-size: 3rem; animation: pop .5s ease; }
-  .success-blip h3 { font-size: 1.4rem; letter-spacing: -.5px; }
-  .success-blip p { color: var(--muted); font-size: .95rem; }
-  .label-card {
-    background: #fff; border-radius: 16px; border: 1px solid #d8d8d8;
-    box-shadow: var(--shadow-lg); overflow: hidden; position: relative;
-    font-family: 'Inter', sans-serif; max-width: 620px; margin: 0 auto;
-  }
-  .label-card::after {
-    content: 'DEMO — NOT A REAL LABEL'; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%) rotate(-18deg); font-size: 1.6rem; font-weight: 800;
-    color: rgba(220, 38, 38, .13); white-space: nowrap; pointer-events: none; letter-spacing: .1em;
-  }
-  .label-top {
-    display: flex; justify-content: space-between; align-items: center;
-    background: var(--green-deep); color: #fff; padding: 14px 22px;
-  }
-  .label-top .lg { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; }
-  .label-top .pp { font-size: .75rem; font-weight: 700; letter-spacing: .1em; background: var(--accent); color: var(--green-deep); padding: 4px 12px; border-radius: 999px; }
-  .label-body { padding: 22px; }
-  .label-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding-bottom: 16px; border-bottom: 1.5px dashed #ddd; margin-bottom: 16px; }
-  .label-row h5 { font-size: .68rem; letter-spacing: .12em; color: #999; margin-bottom: 4px; }
-  .label-row p { font-size: .92rem; line-height: 1.45; font-weight: 600; color: #222; }
-  .barcode {
-    height: 58px; margin: 6px 0 4px;
-    background: repeating-linear-gradient(90deg, #111 0 2px, transparent 2px 5px, #111 5px 8px, transparent 8px 10px, #111 10px 11px, transparent 11px 15px, #111 15px 19px, transparent 19px 21px);
-    border-radius: 2px;
-  }
-  .track { text-align: center; font-family: 'Sora', monospace; font-weight: 700; letter-spacing: .18em; font-size: .95rem; color: #222; }
-  .label-meta { display: flex; justify-content: space-between; font-size: .78rem; color: #888; margin-top: 14px; }
-  .label-actions { display: flex; gap: 12px; justify-content: center; margin-top: 26px; flex-wrap: wrap; }
+      /* shipping label */
+      .success-blip {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .success-blip .big {
+        font-size: 3rem;
+        animation: pop 0.5s ease;
+      }
+      .success-blip h3 {
+        font-size: 1.4rem;
+        letter-spacing: -0.5px;
+      }
+      .success-blip p {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .label-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #d8d8d8;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        position: relative;
+        font-family: "Inter", sans-serif;
+        max-width: 620px;
+        margin: 0 auto;
+      }
+      .label-card::after {
+        content: "DEMO · NOT A REAL LABEL";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-18deg);
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: rgba(220, 38, 38, 0.13);
+        white-space: nowrap;
+        pointer-events: none;
+        letter-spacing: 0.1em;
+      }
+      .label-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--green-deep);
+        color: #fff;
+        padding: 14px 22px;
+      }
+      .label-top .lg {
+        font-family: "Sora", sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+      }
+      .label-top .pp {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        background: var(--accent);
+        color: var(--green-deep);
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+      .label-body {
+        padding: 22px;
+      }
+      .label-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        padding-bottom: 16px;
+        border-bottom: 1.5px dashed #ddd;
+        margin-bottom: 16px;
+      }
+      .label-row h5 {
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        color: #999;
+        margin-bottom: 4px;
+      }
+      .label-row p {
+        font-size: 0.92rem;
+        line-height: 1.45;
+        font-weight: 600;
+        color: #222;
+      }
+      .barcode {
+        height: 58px;
+        margin: 6px 0 4px;
+        background: repeating-linear-gradient(
+          90deg,
+          #111 0 2px,
+          transparent 2px 5px,
+          #111 5px 8px,
+          transparent 8px 10px,
+          #111 10px 11px,
+          transparent 11px 15px,
+          #111 15px 19px,
+          transparent 19px 21px
+        );
+        border-radius: 2px;
+      }
+      .track {
+        text-align: center;
+        font-family: "Sora", monospace;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        font-size: 0.95rem;
+        color: #222;
+      }
+      .label-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        color: #888;
+        margin-top: 14px;
+      }
+      .label-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 26px;
+        flex-wrap: wrap;
+      }
 
-  /* ===== FOOTER ===== */
-  footer { border-top: 1px solid var(--line); background: #f4faf6; }
-  .foot-grid {
-    max-width: 1120px; margin: 0 auto; padding: 50px 6vw 30px;
-    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 30px;
-  }
-  @media (max-width: 760px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
-  .foot-grid h4 { font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--green-dark); margin-bottom: 12px; }
-  .foot-grid a { display: block; color: var(--muted); text-decoration: none; font-size: .92rem; margin-bottom: 8px; cursor: pointer; }
-  .foot-grid a:hover { color: var(--green-dark); }
-  .foot-grid .about-blurb { color: var(--muted); font-size: .92rem; max-width: 300px; }
-  .foot-bottom { text-align: center; color: var(--muted); font-size: .85rem; padding: 18px 6vw 34px; }
-  .foot-bottom b { color: var(--green-deep); }
-</style>
-</head>
-<body>
+      /* ===== FOOTER ===== */
+      footer {
+        border-top: 1px solid var(--line);
+        background: #f4faf6;
+      }
+      .foot-grid {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 50px 6vw 30px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 30px;
+      }
+      @media (max-width: 760px) {
+        .foot-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .foot-grid h4 {
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--green-dark);
+        margin-bottom: 12px;
+      }
+      .foot-grid a {
+        display: block;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.92rem;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+      .foot-grid a:hover {
+        color: var(--green-dark);
+      }
+      .foot-grid .about-blurb {
+        color: var(--muted);
+        font-size: 0.92rem;
+        max-width: 300px;
+      }
+      .foot-bottom {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+        padding: 18px 6vw 34px;
+      }
+      .foot-bottom b {
+        color: var(--green-deep);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
 
-<div id="progress"></div>
+    <nav id="nav">
+      <a class="logo" onclick="go('home')"
+        >Green<span>Volt</span><span class="bolt">⚡</span></a
+      >
+      <div class="links">
+        <a data-page="home" onclick="go('home')">Home</a>
+        <a data-page="how" onclick="go('how')">How it works</a>
+        <a data-page="journey" onclick="go('journey')">Where phones go</a>
+        <a data-page="about" onclick="go('about')">About us</a>
+        <a class="cta" onclick="goQuote()">Get a quote</a>
+      </div>
+    </nav>
 
-<nav id="nav">
-  <a class="logo" onclick="go('home')">Re<span>Volt</span><span class="bolt">⚡</span></a>
-  <div class="links">
-    <a data-page="home" onclick="go('home')">Home</a>
-    <a data-page="how" onclick="go('how')">How it works</a>
-    <a data-page="journey" onclick="go('journey')">Where phones go</a>
-    <a data-page="about" onclick="go('about')">About us</a>
-    <a class="cta" onclick="goQuote()">Get a quote</a>
-  </div>
-</nav>
-
-<!-- ================= HOME ================= -->
-<div class="page active" id="page-home">
-
-<header id="top">
-  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-  <div class="eyebrow">♻️ Zero to landfill — verified</div>
-  <h1>That phone in your drawer?<br><em>It's worth money.</em></h1>
-  <p class="sub">We buy old and dead phones, take them apart, and give every component a second life — batteries to LED makers, screens to repair shops, gold to recovery. You get paid. The planet gets a break.</p>
-  <div class="hero-btns">
-    <a class="btn-primary" href="#quote">Get an instant quote</a>
-    <a class="btn-ghost" onclick="go('journey')">See where your phone goes</a>
-  </div>
-  <div class="hero-stats">
-    <div class="stat"><b class="count" data-target="12483">0</b><span>phones rescued from drawers</span></div>
-    <div class="stat"><b>0</b><span>devices sent to landfill</span></div>
-    <div class="stat"><b class="count" data-target="3100" data-suffix=" kg">0</b><span>e-waste diverted</span></div>
-    <div class="stat"><b class="count" data-target="186" data-prefix="$" data-suffix="k">0</b><span>paid out to customers</span></div>
-  </div>
-</header>
-
-<div class="toc">
-  <div class="inner">
-    <span class="label">On this page</span>
-    <a href="#how-home">How it works</a>
-    <a href="#quote">Instant quote</a>
-    <a href="#journey-home">Where phones go</a>
-    <a href="#why">Why us</a>
-    <span style="flex:1"></span>
-    <a onclick="go('how')" style="cursor:pointer">Full process →</a>
-    <a onclick="go('about')" style="cursor:pointer">About us →</a>
-  </div>
-</div>
-
-<section id="how-home">
-  <div class="kicker reveal">Simple by design</div>
-  <h2 class="sec reveal">How it works</h2>
-  <p class="sec-sub reveal d1">Three steps. Your phone doesn't even need to turn on.</p>
-  <div class="steps">
-    <div class="step reveal d1"><div class="num">1</div><h3>Get your quote</h3><p>Tell us the model and condition. Dead battery? Cracked screen? We still pay — nobody else wants dead phones. We do.</p><a class="more" onclick="go('how')">Learn more →</a></div>
-    <div class="step reveal d2"><div class="num">2</div><h3>Ship it free</h3><p>Print a prepaid label or drop it at a collection box at partner schools and stores. Every device gets certified data erasure.</p><a class="more" onclick="go('how')">Learn more →</a></div>
-    <div class="step reveal d3"><div class="num">3</div><h3>Get paid</h3><p>Cash or store credit within 5 days. Then track your phone's journey — see exactly what its parts became.</p><a class="more" onclick="go('how')">Learn more →</a></div>
-  </div>
-</section>
-
-<section id="quote" style="padding: 20px 6vw 90px;">
-  <div class="quote-wrap reveal">
-    <div class="kicker">Instant estimate</div>
-    <h2 class="sec">What's your drawer worth?</h2>
-    <p class="sec-sub">Condition doesn't scare us — every phone has value on one of our recovery paths.</p>
-    <div class="quote-grid">
-      <div class="qform">
-        <label>Phone brand</label>
-        <select id="brand" onchange="quote()">
-          <option value="35">Apple iPhone</option>
-          <option value="28">Samsung Galaxy</option>
-          <option value="22">Google Pixel</option>
-          <option value="12">Other Android</option>
-        </select>
-        <label>Age</label>
-        <select id="age" onchange="quote()">
-          <option value="1.0">Under 2 years</option>
-          <option value="0.7">2–4 years</option>
-          <option value="0.45">4–6 years</option>
-          <option value="0.25">6+ years</option>
-        </select>
-        <label>Does it turn on?</label>
-        <div class="chips" id="power">
-          <button class="chip active" data-v="1.0" onclick="pick(this,'power')">Yes, works fine</button>
-          <button class="chip" data-v="0.75" onclick="pick(this,'power')">Battery is dying</button>
-          <button class="chip" data-v="0.4" onclick="pick(this,'power')">Completely dead</button>
+    <!-- ================= HOME ================= -->
+    <div class="page active" id="page-home">
+      <header id="top">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+        <h1>That phone in your drawer?<br /><em>It's worth money.</em></h1>
+        <p class="sub">
+          We buy old and dead phones and take them apart, then send every
+          component where it's worth the most: batteries to LED makers, screens
+          to repair shops, gold to recovery. You get paid, and the planet gets a
+          break.
+        </p>
+        <div class="hero-btns">
+          <a class="btn-primary" href="#quote">Get an instant quote</a>
+          <a class="btn-ghost" onclick="go('journey')"
+            >See where your phone goes</a
+          >
         </div>
-        <label>Screen condition</label>
-        <div class="chips" id="screen">
-          <button class="chip active" data-v="1.0" onclick="pick(this,'screen')">Good</button>
-          <button class="chip" data-v="0.7" onclick="pick(this,'screen')">Scratched</button>
-          <button class="chip" data-v="0.45" onclick="pick(this,'screen')">Cracked</button>
+        <div class="hero-stats">
+          <div class="stat">
+            <b class="count" data-target="75" data-suffix="%">0</b>
+            <span>of people still have an old phone sitting at home</span>
+          </div>
+          <div class="stat">
+            <b class="count" data-target="264" data-prefix="$">0</b>
+            <span>sitting unused in the average household's old phones</span>
+          </div>
+          <div class="stat">
+            <b class="count" data-target="80" data-prefix="~" data-suffix="%"
+              >0</b
+            >
+            <span
+              >of a phone's lifetime emissions come from making it, not using
+              it</span
+            >
+          </div>
         </div>
-        <label>Anything else we should know? <span style="font-weight:500;opacity:.7">(optional)</span></label>
-        <textarea id="comments" placeholder="e.g. water damage, battery swells, back glass cracked, still has a case…"></textarea>
-      </div>
-      <div class="quote-result">
-        <div class="label">WE'LL PAY YOU</div>
-        <div class="amount" id="amount">$35</div>
-        <div class="label" id="path">Likely path: <b>full harvest</b></div>
-        <div class="impact" id="impact">
-          <b>Your impact:</b> every harvested component displaces a newly manufactured one — lithium, cobalt, gold and copper kept in circulation instead of mined.
+      </header>
+
+      <div class="toc">
+        <div class="inner">
+          <span class="label">On this page</span>
+          <a href="#how-home">How it works</a>
+          <a href="#quote">Instant quote</a>
+          <a href="#journey-home">Where phones go</a>
+          <a href="#why">Why us</a>
+          <span style="flex: 1"></span>
+          <a onclick="go('how')" style="cursor: pointer">Full process →</a>
+          <a onclick="go('about')" style="cursor: pointer">About us →</a>
         </div>
-        <button onclick="goSell()">Sell my phone →</button>
       </div>
-    </div>
-  </div>
-</section>
 
-<section id="journey-home" style="padding-top: 20px;">
-  <div class="kicker reveal">Full transparency</div>
-  <h2 class="sec reveal">Where your phone goes</h2>
-  <p class="sec-sub reveal d1">Every phone is fully disassembled, and every component is sold to whoever values it most — nothing idles, nothing is landfilled.</p>
-  <div class="journey">
-    <div class="jcard j1 reveal d1"><div class="ico">🔋</div><div><div class="pct">Path 1</div><h3>Battery's second life</h3><p>"Dead" phone batteries still hold up to 70–80% capacity — plenty for LED lights, power banks and small electronics. We test, grade and sell cells to manufacturers.</p></div></div>
-    <div class="jcard j2 reveal d2"><div class="ico">🔧</div><div><div class="pct">Path 2</div><h3>Parts to repair shops</h3><p>Screens, cameras, speakers and charging ports keep other phones alive. Your dead phone becomes someone else's repair — no new parts manufactured.</p></div></div>
-    <div class="jcard j3 reveal d3"><div class="ico">⛏️</div><div><div class="pct">Path 3</div><h3>Urban mining</h3><p>Circuit boards go to certified recovery: gold, silver, copper and palladium. A tonne of boards holds more gold than a tonne of ore — no digging required.</p></div></div>
-    <div class="jcard j4 reveal d4"><div class="ico">♻️</div><div><div class="pct">Path 4</div><h3>Frame &amp; glass recycling</h3><p>Aluminum frames are recycled at ~95% energy savings vs. new; hardened glass is downcycled into tiles and surfaces. The last gram accounted for.</p></div></div>
-  </div>
-  <div class="zero reveal">🌍 Nothing leaves our facility as garbage — only as a product, a part, or a raw material. <a onclick="go('journey')" style="color:var(--green-dark);cursor:pointer">See the full breakdown →</a></div>
-</section>
-
-<section id="why" style="padding-top: 20px;">
-  <div class="kicker reveal">The honest comparison</div>
-  <h2 class="sec reveal">Why sell to us instead of a trade-in?</h2>
-  <p class="sec-sub reveal d1">Manufacturer trade-ins have one goal: getting you to buy a new phone.</p>
-  <div class="why">
-    <div class="card reveal d1"><div class="ic">💀</div><div><h3>We buy dead phones</h3><p>Trade-ins reject them. We pay cash for phones that won't even turn on — that's most of what's in your drawer.</p></div></div>
-    <div class="card reveal d2"><div class="ic">💸</div><div><h3>Cash, no strings</h3><p>No "credit toward a new device." You get paid whether you buy anything or not.</p></div></div>
-    <div class="card reveal d3"><div class="ic">🔍</div><div><h3>Radical transparency</h3><p>Track your phone's journey and see what its parts became. Trade-in programs tell you nothing.</p></div></div>
-    <div class="card reveal d4"><div class="ic">🔒</div><div><h3>Certified data wipe</h3><p>Every device gets certified data erasure before disassembly — confirmation sent to you.</p></div></div>
-  </div>
-</section>
-
-<div class="band reveal">
-  <div class="inner">
-    <h2>Your drawer is a gold mine.<br>Literally.</h2>
-    <p>The average household has 3+ unused phones. Get them valued in under a minute.</p>
-    <a href="#quote">Open the drawer →</a>
-  </div>
-</div>
-
-</div><!-- /home -->
-
-<!-- ================= HOW IT WORKS (DETAIL) ================= -->
-<div class="page" id="page-how">
-
-<div class="page-hero">
-  <h1>How it works, <em>in detail</em></h1>
-  <p>From the drawer to a second life — every step of what happens to your phone.</p>
-</div>
-
-<div class="toc">
-  <div class="inner">
-    <span class="label">On this page</span>
-    <a href="#d-quote">1 · Quote</a>
-    <a href="#d-ship">2 · Ship or drop off</a>
-    <a href="#d-wipe">3 · Data wipe</a>
-    <a href="#d-disassembly">4 · Disassembly &amp; grading</a>
-    <a href="#d-pay">5 · Payment &amp; tracking</a>
-    <a href="#d-faq">FAQ</a>
-  </div>
-</div>
-
-<section style="padding-top: 50px;">
-  <div class="detail reveal" id="d-quote">
-    <div class="dnum">1</div>
-    <div>
-      <div class="tag">~60 seconds</div>
-      <h3>Get your instant quote</h3>
-      <p>Our quote engine doesn't guess — it prices your phone by the <b>value of its recoverable parts</b>. A dead phone with a good screen is worth more than a working phone with a cracked one, because the screen is the single most valuable component.</p>
-      <ul>
-        <li>Enter brand, model, age, and condition — takes under a minute</li>
-        <li>Honest condition = accurate quote; we re-check on arrival and only adjust if the description was off</li>
-        <li>Even a fully dead, cracked phone gets a minimum $5 — its circuit board alone is worth that in recoverable metals</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="detail reveal" id="d-ship">
-    <div class="dnum">2</div>
-    <div>
-      <div class="tag">Free, always</div>
-      <h3>Ship it free or drop it off</h3>
-      <p>Two ways to get your phone to us, both at zero cost:</p>
-      <ul>
-        <li><b>Mail-in:</b> print a prepaid shipping label from your quote confirmation, use any box, drop it at the post office</li>
-        <li><b>Drop boxes:</b> secure collection boxes at partner schools, malls, and repair shops — scan the QR on the box to link the phone to your quote</li>
-      </ul>
-      <p>Running a school fundraiser? Our <b>collection drive program</b> turns class competitions into e-waste hauls — we provide the boxes, posters, and a per-phone payout to the school.</p>
-    </div>
-  </div>
-
-  <div class="detail reveal" id="d-wipe">
-    <div class="dnum">3</div>
-    <div>
-      <div class="tag">Before anything else</div>
-      <h3>Certified data erasure</h3>
-      <p>The first thing that happens to every device — before disassembly, before grading — is a <b>certified data wipe</b>. Storage chips from phones that can't be wiped electronically are physically destroyed.</p>
-      <ul>
-        <li>You receive an erasure confirmation by email for every device</li>
-        <li>No phone is opened, sold, or processed until its data is gone</li>
-        <li>Tip: sign out of your accounts and factory-reset before sending if you can — but if the phone is dead, don't worry, that's our job</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="detail reveal" id="d-disassembly">
-    <div class="dnum">4</div>
-    <div>
-      <div class="tag">The heart of ReVolt</div>
-      <h3>Disassembly, testing &amp; grading</h3>
-      <p>Trained technicians take each phone apart completely. Every component is tested and given a grade — the same way the EV industry grades second-life car batteries:</p>
-      <ul>
-        <li><b>Battery cells:</b> capacity-tested and graded A/B/C — grade A/B cells go to small-electronics manufacturers, grade C to material recovery</li>
-        <li><b>Screens, cameras, ports, speakers:</b> function-tested, graded, and listed for repair shops</li>
-        <li><b>Circuit boards:</b> batched for certified precious-metal recovery</li>
-        <li><b>Frames &amp; glass:</b> sorted by material for recycling</li>
-      </ul>
-      <p>Grading is what makes buyers trust used parts — every part we sell carries its test results.</p>
-    </div>
-  </div>
-
-  <div class="detail reveal" id="d-pay">
-    <div class="dnum">5</div>
-    <div>
-      <div class="tag">Within 5 days</div>
-      <h3>Payment &amp; journey tracking</h3>
-      <p>Once your phone arrives and matches its description, you're paid within 5 days — <b>cash via e-transfer, or store credit worth 10% extra</b>.</p>
-      <p>Then the part you'll want to screenshot: your <b>journey tracker</b>. Watch your phone's components find their new lives — "your battery now powers an LED work light", "your screen repaired another phone in Calgary". No other buyback tells you what actually happened to your device.</p>
-    </div>
-  </div>
-</section>
-
-<section id="d-faq" style="padding-top: 0;">
-  <div class="kicker reveal">Questions we always get</div>
-  <h2 class="sec reveal">FAQ</h2>
-  <p class="sec-sub reveal d1"></p>
-  <details class="faq reveal"><summary>What if my phone is truly worthless?</summary><div class="body">No phone is. Even a waterlogged, shattered phone contains a circuit board with gold, silver, and copper — so our minimum payout is $5. If we can't reuse a single part, the materials still get recovered, and it still stays out of landfill.</div></details>
-  <details class="faq reveal"><summary>Is my data really safe?</summary><div class="body">Yes — certified erasure happens before any other processing, and you get written confirmation per device. Chips that can't be electronically wiped are physically shredded. We'd rather destroy a sellable part than risk your data.</div></details>
-  <details class="faq reveal"><summary>My battery is swollen — can I still send it?</summary><div class="body">Yes, but tell us in the comments box when you get your quote. Swollen batteries need special packaging (we'll ship you a fireproof bag) and go straight to certified recycling rather than reuse.</div></details>
-  <details class="faq reveal"><summary>Do you take tablets, smartwatches, or laptops?</summary><div class="body">Phones are our focus today, but tablets and smartwatches use the same parts ecosystem — they're next on our roadmap. Join a school collection drive and we'll take them as part of the haul.</div></details>
-  <details class="faq reveal"><summary>Why do you pay more than trade-in programs?</summary><div class="body">Because we monetize every component — battery, screen, camera, board, frame — while trade-ins only value phones they can resell whole. And we buy dead phones they flat-out reject. More revenue per phone means more payout per phone.</div></details>
-</section>
-
-<div class="band reveal">
-  <div class="inner">
-    <h2>Ready to see what yours is worth?</h2>
-    <p>Sixty seconds. Free shipping. Paid in five days.</p>
-    <a onclick="goQuote()">Get my quote →</a>
-  </div>
-</div>
-
-</div><!-- /how -->
-
-<!-- ================= WHERE PHONES GO (DETAIL) ================= -->
-<div class="page" id="page-journey">
-
-<div class="page-hero">
-  <h1>Where your phone goes — <em>every gram of it</em></h1>
-  <p>A phone is ~30 components and 60+ elements. Here's who values each one, and why reuse beats recycling.</p>
-</div>
-
-<div class="toc">
-  <div class="inner">
-    <span class="label">On this page</span>
-    <a href="#waterfall">The reuse waterfall</a>
-    <a href="#components">Component breakdown</a>
-    <a href="#impact-math">The environmental math</a>
-  </div>
-</div>
-
-<section id="waterfall" style="padding-top: 50px;">
-  <div class="kicker reveal">Our rule</div>
-  <h2 class="sec reveal">The reuse waterfall</h2>
-  <p class="sec-sub reveal d1">Every component takes the highest step available. Reuse always beats recycling — recycling still costs energy; reuse costs almost none.</p>
-
-  <div class="detail reveal">
-    <div class="dico">🔋</div>
-    <div>
-      <div class="tag">Path 1 · Reuse</div>
-      <h3>Battery cells → small-electronics manufacturers</h3>
-      <p>A phone battery "dies" for phone duty at 70–80% of its original capacity — but that's plenty for less demanding devices. After capacity testing and grading, our cells power <b>LED work lights, power banks, solar garden lights, and portable speakers</b>.</p>
-      <p>This is the same proven model the EV industry uses: "retired" car batteries run grid storage for another decade. We're bringing that logic to the billions of phone cells sitting idle in drawers.</p>
-    </div>
-  </div>
-
-  <div class="detail reveal">
-    <div class="dico">🔧</div>
-    <div>
-      <div class="tag">Path 2 · Reuse</div>
-      <h3>Working parts → the repair market</h3>
-      <p>Screens, cameras, speakers, vibration motors, charging ports, buttons, SIM trays — repair shops need all of it, constantly. A tested, graded screen from a dead phone is <b>the single most valuable thing we sell</b>, often worth more than the rest of the phone combined.</p>
-      <p>Every part we supply means one less new part manufactured — and one more phone somewhere that gets repaired instead of replaced. Our dead phones keep other people's phones alive.</p>
-    </div>
-  </div>
-
-  <div class="detail reveal">
-    <div class="dico">⛏️</div>
-    <div>
-      <div class="tag">Path 3 · Recovery</div>
-      <h3>Circuit boards → urban mining</h3>
-      <p>Phone circuit boards are astonishingly rich: <b>a tonne of boards contains more gold than a tonne of gold ore</b> — plus silver, copper, and palladium. We batch boards and sell them to certified precious-metal recovery partners.</p>
-      <p>Every gram recovered is a gram that doesn't need to be mined, with all the habitat destruction, water use, and emissions mining brings.</p>
-    </div>
-  </div>
-
-  <div class="detail reveal">
-    <div class="dico">♻️</div>
-    <div>
-      <div class="tag">Path 4 · Recycling</div>
-      <h3>Frames, glass &amp; everything else</h3>
-      <p>Aluminum frames are recycled at <b>~95% energy savings</b> versus producing new aluminum. Hardened phone glass can't become new phone glass, but it's downcycled into tiles, countertops, and abrasives. Rare-earth magnets from speakers and motors are recovered — rare earths are among the most supply-constrained materials on Earth.</p>
-      <p>The residue after all four paths? A small fraction of the phone's mass — and shrinking as recovery tech improves.</p>
-    </div>
-  </div>
-</section>
-
-<section id="components" style="padding-top: 0;">
-  <div class="kicker reveal">The full picture</div>
-  <h2 class="sec reveal">Component-by-component breakdown</h2>
-  <p class="sec-sub reveal d1">Who buys each part of your phone, and what it becomes.</p>
-  <div class="tbl-wrap reveal">
-    <table class="tbl">
-      <thead><tr><th>Component</th><th>Who buys it</th><th>What it becomes</th><th>Why it matters</th></tr></thead>
-      <tbody>
-        <tr><td>🔋 Battery cells</td><td>LED &amp; power-bank makers</td><td>Work lights, power banks, solar lights</td><td class="val">70–80% capacity saved from waste</td></tr>
-        <tr><td>📱 Screen</td><td>Repair shops</td><td>Replacement display</td><td class="val">Highest-value part; saves another phone</td></tr>
-        <tr><td>📷 Cameras</td><td>Repair shops, makers</td><td>Repairs, DIY &amp; robotics projects</td><td>Complex modules, expensive to make new</td></tr>
-        <tr><td>🔊 Speakers &amp; motors</td><td>Repair shops, recyclers</td><td>Repairs + rare-earth magnet recovery</td><td>Rare earths are supply-constrained</td></tr>
-        <tr><td>🔌 Ports &amp; buttons</td><td>Repair shops</td><td>Replacement parts</td><td>Most common repair after screens</td></tr>
-        <tr><td>🧠 Circuit board</td><td>Metal recovery firms</td><td>Gold, silver, copper, palladium</td><td class="val">Richer than mined ore</td></tr>
-        <tr><td>🩶 Aluminum frame</td><td>Metal recyclers</td><td>New aluminum products</td><td class="val">~95% energy saved vs. new</td></tr>
-        <tr><td>🪟 Glass</td><td>Material processors</td><td>Tiles, countertops, abrasives</td><td>Downcycled, not landfilled</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="impact-math" style="padding-top: 0;">
-  <div class="kicker reveal">Why this works</div>
-  <h2 class="sec reveal">The environmental math</h2>
-  <p class="sec-sub reveal d1">The key idea: most of a phone's footprint happens before it's ever switched on.</p>
-  <div class="why">
-    <div class="card reveal d1"><div class="ic">🏭</div><div><h3>Manufacturing dominates</h3><p>Around 80% of a smartphone's lifetime emissions come from making it — mining, refining, fabrication — not from using it. Reusing parts attacks that 80%.</p></div></div>
-    <div class="card reveal d2"><div class="ic">🔁</div><div><h3>Reuse &gt; recycling</h3><p>Recycling melts things down and rebuilds them — that costs energy. Reuse skips the whole cycle: a reused screen has almost zero added footprint.</p></div></div>
-    <div class="card reveal d3"><div class="ic">🗄️</div><div><h3>Drawers are the blocker</h3><p>Billions of phones sit unused worldwide. The materials exist — they're just parked. Paying cash is what finally opens the drawer.</p></div></div>
-    <div class="card reveal d4"><div class="ic">⚖️</div><div><h3>Displacement is the win</h3><p>Every reused part displaces a newly manufactured one. That's the metric we optimize: not tonnes collected, but manufacturing avoided.</p></div></div>
-  </div>
-  <div class="zero reveal">🌍 Nothing leaves our facility as garbage — only as a product, a part, or a raw material.</div>
-</section>
-
-<div class="band reveal">
-  <div class="inner">
-    <h2>Give your phone its next life.</h2>
-    <p>Every part has somewhere better to be than a drawer.</p>
-    <a onclick="goQuote()">Get my quote →</a>
-  </div>
-</div>
-
-</div><!-- /journey -->
-
-<!-- ================= ABOUT ================= -->
-<div class="page" id="page-about">
-
-<div class="page-hero">
-  <h1>We mine drawers, <em>not the earth</em></h1>
-  <p>ReVolt is Team Green's answer to a simple, absurd fact: the world's most resource-rich "mine" is sitting in kitchen drawers.</p>
-</div>
-
-<div class="toc">
-  <div class="inner">
-    <span class="label">On this page</span>
-    <a href="#mission">Mission &amp; vision</a>
-    <a href="#story">Our story</a>
-    <a href="#values-sec">What we believe</a>
-    <a href="#team-sec">The team</a>
-  </div>
-</div>
-
-<section id="mission" style="padding-top: 50px;">
-  <div class="kicker reveal">Why we exist</div>
-  <h2 class="sec reveal">Mission &amp; vision</h2>
-  <p class="sec-sub reveal d1"></p>
-  <div class="detail reveal">
-    <div class="dico">🎯</div>
-    <div>
-      <h3>Our mission</h3>
-      <p>To get every idle phone out of the drawer and every one of its components into active use — paying people fairly for what they own, and proving that a dead phone is a resource, not waste.</p>
-    </div>
-  </div>
-  <div class="detail reveal">
-    <div class="dico">🔭</div>
-    <div>
-      <h3>Our vision</h3>
-      <p>A world where "throwing away electronics" sounds as outdated as burning garbage in the backyard — where every device's end of life is simply the start of its components' next one. Organ donation, for phones.</p>
-    </div>
-  </div>
-</section>
-
-<section id="story" style="padding-top: 0;">
-  <div class="kicker reveal">How this started</div>
-  <h2 class="sec reveal">Our story</h2>
-  <p class="sec-sub reveal d1"></p>
-  <div class="detail reveal">
-    <div class="dico">💡</div>
-    <div>
-      <p>ReVolt was born at <b>Shad 2026 at the University of Alberta</b>, where our team was challenged to reimagine the lifecycle of everyday goods. We started with a question everyone in the room could answer: <b>"how many old phones are in a drawer at your house right now?"</b> Nobody said zero.</p>
-      <p>Then we learned two facts that wouldn't leave us alone: a "dead" phone battery still holds up to 80% of its capacity, and a tonne of phone circuit boards contains more gold than a tonne of gold ore. The waste wasn't being thrown away — it was being <em>stored</em>, invisibly, in millions of homes. Nobody was paying people to open the drawer.</p>
-      <p>So that became the business: pay cash for the phones nobody else wants, take them apart with care, and route every component to whoever values it most. You've read the rest of the site — that's the whole idea. It just needed someone to do it.</p>
-    </div>
-  </div>
-</section>
-
-<section id="values-sec" style="padding-top: 0;">
-  <div class="kicker reveal">Our principles</div>
-  <h2 class="sec reveal">What we believe</h2>
-  <p class="sec-sub reveal d1"></p>
-  <div class="values">
-    <div class="vcard reveal d1"><h3>♻️ Reuse before recycling</h3><p>Recycling is the fallback, never the goal. A part in use is worth ten parts melted down — so every component takes the highest step on our waterfall it can.</p></div>
-    <div class="vcard reveal d2"><h3>💸 Pay people fairly</h3><p>The drawer stays shut because nobody rewards opening it. Fair cash payouts aren't a marketing cost — they're the engine of the whole model.</p></div>
-    <div class="vcard reveal d3"><h3>🔍 Prove it, don't claim it</h3><p>"Eco-friendly" is cheap to say. We show every seller exactly where their phone's parts went. If we can't prove a green claim, we don't make it.</p></div>
-    <div class="vcard reveal d4"><h3>🔒 Privacy is non-negotiable</h3><p>Certified data erasure before any processing, always. We'd rather destroy a sellable part than risk a customer's data.</p></div>
-  </div>
-</section>
-
-<section id="team-sec" style="padding-top: 0;">
-  <div class="kicker reveal">Team Green</div>
-  <h2 class="sec reveal">The team</h2>
-  <p class="sec-sub reveal d1">Five students, one drawer full of dead phones, and a month at Shad UAlberta 2026.</p>
-  <div class="team">
-    <div class="member reveal d1"><div class="avatar">🧑‍💼</div><h3>[Name]</h3><p>Project Lead</p></div>
-    <div class="member reveal d2"><div class="avatar">🔬</div><h3>[Name]</h3><p>Research Lead</p></div>
-    <div class="member reveal d3"><div class="avatar">🎨</div><h3>[Name]</h3><p>Design &amp; Prototype</p></div>
-    <div class="member reveal d4"><div class="avatar">📊</div><h3>[Name]</h3><p>Finance Lead</p></div>
-    <div class="member reveal d4"><div class="avatar">🎤</div><h3>[Name]</h3><p>Pitch Lead</p></div>
-  </div>
-</section>
-
-<div class="band reveal">
-  <div class="inner">
-    <h2>Join the revolt against the drawer.</h2>
-    <p>Your old phone is someone's repair, someone's power bank, someone's gold.</p>
-    <a onclick="goQuote()">Get my quote →</a>
-  </div>
-</div>
-
-</div><!-- /about -->
-
-<!-- ================= SELL FLOW ================= -->
-<div class="page" id="page-sell">
-
-<div class="page-hero" style="padding-bottom: 20px;">
-  <h1>Sell your phone in <em>three steps</em></h1>
-  <p>Photos → your details → prepaid shipping label. Two minutes, start to finish.</p>
-</div>
-
-<div class="stepper">
-  <div class="st active" id="st1"><div class="dot">1</div><div class="lbl">Photos</div><div class="bar2"></div></div>
-  <div class="st" id="st2"><div class="dot">2</div><div class="lbl">Your details</div><div class="bar2"></div></div>
-  <div class="st" id="st3"><div class="dot">3</div><div class="lbl">Shipping label</div></div>
-</div>
-
-<section style="padding-top: 36px;">
-
-  <div class="qsummary">
-    <span>Your quote</span>
-    <span class="amt" id="sell-amount">$35</span>
-    <span style="font-weight:600; font-size:.88rem; opacity:.85;" id="sell-path">full harvest</span>
-  </div>
-
-  <!-- STEP 1: PHOTOS -->
-  <div class="sell-panel active" id="panel-1">
-    <div class="dropzone" onclick="document.getElementById('photo-input').click()">
-      <div class="dzico">📸</div>
-      <h3>Add photos of your phone</h3>
-      <p>Click to browse (or drag &amp; drop) — front, back, and any damage. This confirms your quote so there are no surprises.</p>
-    </div>
-    <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="addPhotos(this.files)">
-    <div class="photo-tips" id="photo-tips">
-      <span id="tip-1">1️⃣ Front of phone</span>
-      <span id="tip-2">2️⃣ Back of phone</span>
-      <span id="tip-3">3️⃣ Close-up of any damage</span>
-    </div>
-    <div class="thumbs" id="thumbs"></div>
-    <div class="flow-btns">
-      <button class="fbtn next" id="next-1" disabled onclick="setStep(2)">Continue → (add at least 2 photos)</button>
-    </div>
-  </div>
-
-  <!-- STEP 2: DETAILS -->
-  <div class="sell-panel" id="panel-2">
-    <div class="sform">
-      <div class="row">
-        <div><label>Full name</label><input id="f-name" placeholder="Alex Green" oninput="checkForm()"></div>
-        <div><label>Email</label><input id="f-email" type="email" placeholder="alex@email.com" oninput="checkForm()"></div>
-      </div>
-      <label>Street address</label><input id="f-addr" placeholder="123 Whyte Ave NW" oninput="checkForm()">
-      <div class="row">
-        <div><label>City</label><input id="f-city" placeholder="Edmonton" oninput="checkForm()"></div>
-        <div><label>Postal code</label><input id="f-postal" placeholder="T6G 2R3" oninput="checkForm()"></div>
-      </div>
-      <label>How should we pay you?</label>
-      <div class="chips payx" id="payx">
-        <button class="chip active" onclick="pickPay(this)">💸 E-transfer</button>
-        <button class="chip" onclick="pickPay(this)">🎁 Store credit (+10%)</button>
-      </div>
-    </div>
-    <div class="flow-btns">
-      <button class="fbtn back2" onclick="setStep(1)">← Back</button>
-      <button class="fbtn next" id="next-2" disabled onclick="makeLabel()">Generate my shipping label →</button>
-    </div>
-  </div>
-
-  <!-- STEP 3: LABEL -->
-  <div class="sell-panel" id="panel-3">
-    <div class="success-blip">
-      <div class="big">🎉</div>
-      <h3>You're all set!</h3>
-      <p>Print the label, box the phone (any box works), and drop it at the post office. Payment lands within 5 days of arrival.</p>
-    </div>
-    <div class="label-card">
-      <div class="label-top">
-        <div class="lg">ReVolt ⚡</div>
-        <div class="pp">PREPAID · TRACKED</div>
-      </div>
-      <div class="label-body">
-        <div class="label-row">
-          <div><h5>FROM</h5><p id="lbl-from">Alex Green<br>123 Whyte Ave NW<br>Edmonton, AB T6G 2R3</p></div>
-          <div><h5>SHIP TO</h5><p>ReVolt Processing Facility<br>Unit 4, 11421 Saskatchewan Dr NW<br>Edmonton, AB T6G 2B4</p></div>
+      <section id="how-home">
+        <div class="kicker reveal">Simple by design</div>
+        <h2 class="sec reveal">How it works</h2>
+        <p class="sec-sub reveal d1">
+          Three steps. Your phone doesn't even need to turn on.
+        </p>
+        <div class="steps">
+          <div class="step reveal d1">
+            <div class="num">1</div>
+            <h3>Get your quote</h3>
+            <p>
+              Tell us the model and condition. Dead battery, cracked screen,
+              doesn't matter. Nobody else wants dead phones, but we do.
+            </p>
+            <a class="more" onclick="go('how')">Learn more →</a>
+          </div>
+          <div class="step reveal d2">
+            <div class="num">2</div>
+            <h3>Ship it free</h3>
+            <p>
+              Print a prepaid label or drop it at a collection box at partner
+              schools and stores. Every device gets certified data erasure.
+            </p>
+            <a class="more" onclick="go('how')">Learn more →</a>
+          </div>
+          <div class="step reveal d3">
+            <div class="num">3</div>
+            <h3>Get paid</h3>
+            <p>
+              Cash or store credit within 5 days, then track your phone's
+              journey to see exactly what its parts became.
+            </p>
+            <a class="more" onclick="go('how')">Learn more →</a>
+          </div>
         </div>
-        <div class="barcode"></div>
-        <div class="track" id="lbl-track">REV-2026-000000</div>
-        <div class="label-meta">
-          <span>Service: Standard Ground</span>
-          <span id="lbl-quote">Quote: $35</span>
-          <span>Weight: &lt; 0.5 kg</span>
+      </section>
+
+      <section id="quote" style="padding: 20px 6vw 90px">
+        <div class="quote-wrap reveal">
+          <div class="kicker">Instant estimate</div>
+          <h2 class="sec">What's your drawer worth?</h2>
+          <p class="sec-sub">
+            Condition doesn't scare us. Every phone has value on one of our
+            recovery paths.
+          </p>
+          <div class="quote-grid">
+            <div class="qform">
+              <label>Photos</label>
+              <div
+                class="dropzone"
+                onclick="document.getElementById('photo-input').click()"
+              >
+                <h3>Add photos of your phone</h3>
+                <p>
+                  Click to browse, or drag and drop. Add the front, the back,
+                  and any damage. This confirms your quote, so there are no
+                  surprises.
+                </p>
+              </div>
+              <input
+                type="file"
+                id="photo-input"
+                accept="image/*"
+                multiple
+                style="display: none"
+                onchange="addPhotos(this.files)"
+              />
+              <div class="photo-tips" id="photo-tips">
+                <span>A team member will respond within 30 minutes</span>
+              </div>
+              <div class="thumbs" id="thumbs"></div>
+
+              <label>Phone brand</label>
+              <select id="brand" onchange="onBrandChange()">
+                <option value="iphone">Apple iPhone</option>
+                <option value="samsung">Samsung Galaxy</option>
+                <option value="pixel">Google Pixel</option>
+                <option value="other">Other Android</option>
+              </select>
+              <label>Phone model</label>
+              <select id="model" onchange="quote()"></select>
+              <input
+                type="text"
+                id="model-other"
+                placeholder="e.g. OnePlus 11, Motorola Edge…"
+                oninput="quote()"
+                style="display: none"
+              />
+              <label>Does it turn on?</label>
+              <div class="chips" id="power">
+                <button
+                  class="chip active"
+                  data-v="0.75"
+                  onclick="pick(this, 'power')"
+                >
+                  Battery is dying
+                </button>
+                <button class="chip" data-v="0.4" onclick="pick(this, 'power')">
+                  Completely dead
+                </button>
+              </div>
+              <label
+                >Anything else we should know?
+                <span style="font-weight: 500; opacity: 0.7"
+                  >(optional)</span
+                ></label
+              >
+              <textarea
+                id="comments"
+                placeholder="e.g. water damage, battery swells, back glass cracked, still has a case…"
+              ></textarea>
+            </div>
+            <div class="quote-result">
+              <div class="label">ESTIMATED PAYOUT</div>
+              <div class="amount" id="amount">~$35</div>
+              <div class="estimate-note">
+                This is a preliminary estimate based on your answers. We can't
+                inspect the phone remotely, so a team member confirms your final
+                offer after reviewing your photos, usually within 80% of this
+                number.
+              </div>
+              <div class="label" id="path">
+                Likely path:
+                <b>battery to LED/power bank makers + parts to repair shops</b>
+              </div>
+              <div class="impact" id="impact">
+                <b>Your impact:</b> every harvested component displaces a newly
+                manufactured one. Lithium, cobalt, gold, and copper stay in
+                circulation instead of being mined.
+              </div>
+              <button id="sell-btn" disabled onclick="goSell()">
+                Sell my phone → (add at least 2 photos)
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="journey-home" style="padding-top: 20px">
+        <div class="kicker reveal">Full transparency</div>
+        <h2 class="sec reveal">Where your phone goes</h2>
+        <p class="sec-sub reveal d1">
+          Every phone is fully disassembled, and every component is sold to
+          whoever values it most. Our goal is for nothing to idle and nothing
+          to be landfilled.
+        </p>
+        <div class="journey">
+          <div class="jcard j1 reveal d1">
+            <div>
+              <div class="pct">Path 1</div>
+              <h3>Battery's second life</h3>
+              <p>
+                A "dead" phone battery still holds up to 70 to 80% of its
+                capacity, plenty for LED lights, power banks, and small
+                electronics. We test, grade, and sell cells to manufacturers.
+              </p>
+            </div>
+          </div>
+          <div class="jcard j2 reveal d2">
+            <div>
+              <div class="pct">Path 2</div>
+              <h3>Parts to repair shops</h3>
+              <p>
+                Screens, cameras, speakers, and charging ports keep other phones
+                alive. Your dead phone becomes someone else's repair, with no
+                new parts manufactured.
+              </p>
+            </div>
+          </div>
+          <div class="jcard j3 reveal d3">
+            <div>
+              <div class="pct">Path 3</div>
+              <h3>Urban mining</h3>
+              <p>
+                Circuit boards go to certified recovery for gold, silver,
+                copper, and palladium. A tonne of boards holds more gold than a
+                tonne of ore, and none of it needs digging up.
+              </p>
+            </div>
+          </div>
+          <div class="jcard j4 reveal d4">
+            <div>
+              <div class="pct">Path 4</div>
+              <h3>Frame &amp; glass recycling</h3>
+              <p>
+                Aluminum frames are recycled at roughly 95% energy savings
+                versus new. Hardened glass gets downcycled into tiles and
+                surfaces. The last gram is accounted for.
+              </p>
+            </div>
+          </div>
+          <div class="jcard j5 reveal d5">
+            <div>
+              <div class="pct">Path 5</div>
+              <h3>Dead component disposal</h3>
+              <p>
+                Battery cells that fail testing, swollen cells, and anything
+                else with zero recovery value are meant for certified
+                hazardous-waste recyclers, funded by the manufacturer, not
+                landfilled by us directly. That's the design, not a measured
+                result yet.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="zero reveal">
+          Our goal: nothing leaves our facility as garbage, only as a
+          product, a part, or a raw material.
+          <a
+            onclick="go('journey')"
+            style="color: var(--green-dark); cursor: pointer"
+            >See the full breakdown →</a
+          >
+        </div>
+      </section>
+
+      <section id="why" style="padding-top: 20px">
+        <div class="kicker reveal">The honest comparison</div>
+        <h2 class="sec reveal">Why sell to us instead of a trade-in?</h2>
+        <p class="sec-sub reveal d1">
+          Manufacturer trade-ins have one goal: getting you to buy a new phone.
+        </p>
+        <div class="why">
+          <div class="card reveal d1">
+            <div>
+              <h3>We buy dead phones</h3>
+              <p>
+                Trade-ins reject them, but we pay cash for phones that won't
+                even turn on, which is most of what's sitting in your drawer.
+              </p>
+            </div>
+          </div>
+          <div class="card reveal d2">
+            <div>
+              <h3>Cash, no strings</h3>
+              <p>
+                No "credit toward a new device." You get paid whether you buy
+                anything or not.
+              </p>
+            </div>
+          </div>
+          <div class="card reveal d3">
+            <div>
+              <h3>Radical transparency</h3>
+              <p>
+                Track your phone's journey and see what its parts became.
+                Trade-in programs tell you nothing.
+              </p>
+            </div>
+          </div>
+          <div class="card reveal d4">
+            <div>
+              <h3>Certified data wipe</h3>
+              <p>
+                Every device gets certified data erasure before disassembly, and
+                confirmation gets sent to you.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="band reveal">
+        <div class="inner">
+          <h2>Your drawer is a gold mine.<br />Literally.</h2>
+          <p>
+            The average household has 3+ unused phones. Get them valued in under
+            a minute.
+          </p>
+          <a href="#quote">Open the drawer →</a>
         </div>
       </div>
     </div>
-    <div class="label-actions">
-      <button class="fbtn next" onclick="alert('Demo mode 🌱 — in the real product this opens your printer dialog!')">🖨️ Print label</button>
-      <button class="fbtn back2" onclick="alert('Demo mode 🌱 — in the real product this emails you the label + tracking link!')">📧 Email it to me</button>
-      <button class="fbtn back2" onclick="go('home')">Done — back home</button>
+    <!-- /home -->
+
+    <!-- ================= HOW IT WORKS (DETAIL) ================= -->
+    <div class="page" id="page-how">
+      <div class="page-hero">
+        <h1>How it works, <em>in detail</em></h1>
+        <p>
+          From the drawer to a second life: every step of what happens to your
+          phone.
+        </p>
+      </div>
+
+      <div class="toc">
+        <div class="inner">
+          <span class="label">On this page</span>
+          <a href="#d-quote">1 · Quote</a>
+          <a href="#d-ship">2 · Ship or drop off</a>
+          <a href="#d-wipe">3 · Data wipe</a>
+          <a href="#d-disassembly">4 · Disassembly &amp; grading</a>
+          <a href="#d-pay">5 · Payment &amp; tracking</a>
+          <a href="#d-faq">FAQ</a>
+        </div>
+      </div>
+
+      <section style="padding-top: 50px">
+        <div class="detail reveal" id="d-quote">
+          <div class="dnum">1</div>
+          <div>
+            <div class="tag">~60 seconds</div>
+            <h3>Get your instant quote</h3>
+            <p>
+              Our quote engine doesn't guess. It prices your phone by the
+              <b>value of its recoverable parts</b>, so a newer model with a
+              merely dying battery is worth more than an older model that's
+              completely dead, since more of its components are still provably
+              intact.
+            </p>
+            <ul>
+              <li>
+                Tell us your brand, model, and condition. It takes under a
+                minute
+              </li>
+              <li>
+                Honest condition = accurate quote; we re-check on arrival and
+                only adjust if the description was off
+              </li>
+              <li>
+                Even a fully dead, cracked phone gets a minimum of $5, since its
+                circuit board alone is worth that much in recoverable metals
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="detail reveal" id="d-ship">
+          <div class="dnum">2</div>
+          <div>
+            <div class="tag">Free, always</div>
+            <h3>Ship it free or drop it off</h3>
+            <p>Two ways to get your phone to us, both at zero cost:</p>
+            <ul>
+              <li>
+                <b>Mail-in:</b> print a prepaid shipping label from your quote
+                confirmation, use any box, drop it at the post office
+              </li>
+              <li>
+                <b>Drop boxes:</b> secure collection boxes at partner schools,
+                malls, and repair shops. Scan the QR code on the box to link the
+                phone to your quote
+              </li>
+            </ul>
+            <p>
+              Running a school fundraiser? Our
+              <b>collection drive program</b> turns class competitions into
+              e-waste hauls. We provide the boxes, the posters, and a per-phone
+              payout to the school.
+            </p>
+          </div>
+        </div>
+
+        <div class="detail reveal" id="d-wipe">
+          <div class="dnum">3</div>
+          <div>
+            <div class="tag">Before anything else</div>
+            <h3>Certified data erasure</h3>
+            <p>
+              The first thing that happens to every device, before disassembly
+              and before grading, is a <b>certified data wipe</b>. Storage chips
+              from phones that can't be wiped electronically get physically
+              destroyed.
+            </p>
+            <ul>
+              <li>
+                You receive an erasure confirmation by email for every device
+              </li>
+              <li>
+                No phone is opened, sold, or processed until its data is gone
+              </li>
+              <li>
+                Tip: sign out of your accounts and factory reset before sending
+                if you can. If the phone is dead, don't worry, that's our job
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="detail reveal" id="d-disassembly">
+          <div class="dnum">4</div>
+          <div>
+            <div class="tag">The heart of GreenVolt</div>
+            <h3>Disassembly, testing &amp; grading</h3>
+            <p>
+              Trained technicians take each phone apart completely. Every
+              component is tested and given a grade, the same way the EV
+              industry grades second-life car batteries:
+            </p>
+            <ul>
+              <li>
+                <b>Battery cells:</b> capacity-tested and graded A, B, or C.
+                Grade A and B cells go to small-electronics manufacturers, grade
+                C goes to material recovery
+              </li>
+              <li>
+                <b>Screens, cameras, ports, speakers:</b> function-tested,
+                graded, and listed for repair shops
+              </li>
+              <li>
+                <b>Circuit boards:</b> batched for certified precious-metal
+                recovery
+              </li>
+              <li>
+                <b>Frames &amp; glass:</b> sorted by material for recycling
+              </li>
+            </ul>
+            <p>
+              Grading is what makes buyers trust used parts. Every part we sell
+              carries its test results.
+            </p>
+          </div>
+        </div>
+
+        <div class="detail reveal" id="d-pay">
+          <div class="dnum">5</div>
+          <div>
+            <div class="tag">Within 5 days</div>
+            <h3>Payment &amp; journey tracking</h3>
+            <p>
+              Once your phone arrives and matches its description, you're paid
+              within 5 days:
+              <b>cash by e-transfer, or store credit worth 10% extra</b>.
+            </p>
+            <p>
+              Then the part you'll want to screenshot is your
+              <b>journey tracker</b>. It shows you where your components ended
+              up, like your battery now powering an LED work light, or your
+              screen repairing another phone in Calgary. No other buyback tells
+              you what actually happened to your device.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="d-faq" style="padding-top: 0">
+        <div class="kicker reveal">Questions we always get</div>
+        <h2 class="sec reveal">FAQ</h2>
+        <p class="sec-sub reveal d1"></p>
+        <details class="faq reveal">
+          <summary>What if my phone is truly worthless?</summary>
+          <div class="body">
+            No phone is. Even a waterlogged, shattered phone contains a circuit
+            board with gold, silver, and copper, so our minimum payout is $5. If
+            we can't reuse a single part, the materials are still meant to be
+            recovered and kept out of landfill, that's the goal we're built
+            around.
+          </div>
+        </details>
+        <details class="faq reveal">
+          <summary>Is my data really safe?</summary>
+          <div class="body">
+            Yes. Certified erasure happens before any other processing, and you
+            get written confirmation per device. Chips that can't be
+            electronically wiped are physically shredded. We'd rather destroy a
+            sellable part than risk your data.
+          </div>
+        </details>
+        <details class="faq reveal">
+          <summary>My battery is swollen, can I still send it?</summary>
+          <div class="body">
+            Yes, but tell us in the comments box when you get your quote.
+            Swollen batteries need special packaging (we'll ship you a fireproof
+            bag) and go straight to certified recycling rather than reuse.
+          </div>
+        </details>
+        <details class="faq reveal">
+          <summary>Do you take tablets, smartwatches, or laptops?</summary>
+          <div class="body">
+            Phones are our focus today, but tablets and smartwatches use the
+            same parts ecosystem, and they're next on our roadmap. Join a school
+            collection drive and we'll take them as part of the haul.
+          </div>
+        </details>
+        <details class="faq reveal">
+          <summary>Why do you pay more than trade-in programs?</summary>
+          <div class="body">
+            Because we monetize every component (battery, screen, camera, board,
+            frame) while trade-ins only value phones they can resell whole. We
+            also buy dead phones they flat-out reject. More revenue per phone
+            means more payout per phone.
+          </div>
+        </details>
+      </section>
+
+      <div class="band reveal">
+        <div class="inner">
+          <h2>Ready to see what yours is worth?</h2>
+          <p>
+            Sixty seconds to a quote, free shipping, and paid within five days.
+          </p>
+          <a onclick="goQuote()">Get my quote →</a>
+        </div>
+      </div>
     </div>
-  </div>
+    <!-- /how -->
 
-</section>
-</div><!-- /sell -->
+    <!-- ================= WHERE PHONES GO (DETAIL) ================= -->
+    <div class="page" id="page-journey">
+      <div class="page-hero">
+        <h1>Where your phone goes: <em>every gram of it</em></h1>
+        <p>
+          A phone is ~30 components and 60+ elements. Here's who values each
+          one, and why reuse beats recycling.
+        </p>
+      </div>
 
-<!-- ================= FOOTER ================= -->
-<footer>
-  <div class="foot-grid">
-    <div>
-      <a class="logo" onclick="go('home')">Re<span>Volt</span><span class="bolt">⚡</span></a>
-      <p class="about-blurb" style="margin-top:10px;">We buy old and dead phones, disassemble them, and give every component a second life. Cash for you, zero landfill for the planet.</p>
+      <div class="toc">
+        <div class="inner">
+          <span class="label">On this page</span>
+          <a href="#waterfall">The reuse waterfall</a>
+          <a href="#components">Component breakdown</a>
+          <a href="#impact-math">The environmental math</a>
+          <a href="#comparison">GreenVolt vs. the alternative</a>
+        </div>
+      </div>
+
+      <section id="waterfall" style="padding-top: 50px">
+        <div class="kicker reveal">Our rule</div>
+        <h2 class="sec reveal">The reuse waterfall</h2>
+        <p class="sec-sub reveal d1">
+          Every component takes the highest step available. Reuse always beats
+          recycling, since recycling still costs energy while reuse costs almost
+          none.
+        </p>
+
+        <div class="detail reveal">
+          <div>
+            <div class="tag">Path 1 · Reuse</div>
+            <h3>Battery cells → small-electronics manufacturers</h3>
+            <p>
+              A phone battery "dies" for phone duty at 70 to 80% of its original
+              capacity, but that's plenty for less demanding devices. After
+              capacity testing and grading, our cells power
+              <b
+                >LED work lights, power banks, solar garden lights, and portable
+                speakers</b
+              >.
+            </p>
+            <p>
+              This is the same proven model the EV industry uses: "retired" car
+              batteries run grid storage for another decade. We're bringing that
+              logic to the billions of phone cells sitting idle in drawers.
+            </p>
+          </div>
+        </div>
+
+        <div class="detail reveal">
+          <div>
+            <div class="tag">Path 2 · Reuse</div>
+            <h3>Working parts → the repair market</h3>
+            <p>
+              Screens, cameras, speakers, vibration motors, charging ports,
+              buttons, and SIM trays: repair shops need all of it, constantly. A
+              tested, graded screen from a dead phone is
+              <b>the single most valuable thing we sell</b>, often worth more
+              than the rest of the phone combined.
+            </p>
+            <p>
+              Every part we supply means one less new part manufactured, and one
+              more phone somewhere that gets repaired instead of replaced. Our
+              dead phones keep other people's phones alive.
+            </p>
+          </div>
+        </div>
+
+        <div class="detail reveal">
+          <div>
+            <div class="tag">Path 3 · Recovery</div>
+            <h3>Circuit boards → urban mining</h3>
+            <p>
+              Phone circuit boards are astonishingly rich:
+              <b
+                >a tonne of boards contains more gold than a tonne of gold
+                ore</b
+              >, plus silver, copper, and palladium. We batch boards and sell
+              them to certified precious-metal recovery partners.
+            </p>
+            <p>
+              Every gram recovered is a gram that doesn't need to be mined, with
+              all the habitat destruction, water use, and emissions mining
+              brings.
+            </p>
+          </div>
+        </div>
+
+        <div class="detail reveal">
+          <div>
+            <div class="tag">Path 4 · Recycling</div>
+            <h3>Frames, glass &amp; everything else</h3>
+            <p>
+              Aluminum frames are recycled at <b>~95% energy savings</b> versus
+              producing new aluminum. Hardened phone glass can't become new
+              phone glass, but it's downcycled into tiles, countertops, and
+              abrasives. Rare-earth magnets from speakers and motors are
+              recovered, since rare earths are among the most supply-constrained
+              materials on Earth.
+            </p>
+            <p>
+              The residue after all five paths is a small fraction of the
+              phone's mass, and it's shrinking as recovery tech improves.
+            </p>
+          </div>
+        </div>
+
+        <div class="detail reveal">
+          <div>
+            <div class="tag">Path 5 · Disposal</div>
+            <h3>Dead components &amp; certified hazardous-waste recovery</h3>
+            <p>
+              Not everything clears testing. Battery cells that fail capacity
+              checks, swollen or physically damaged cells, and any material
+              left with zero resale or recovery value still can't just go in
+              the trash.
+            </p>
+            <p>
+              These are meant for certified domestic recyclers, Call2Recycle
+              for batteries, EPRA for other e-waste, funded by the
+              manufacturer's producer Environmental Handling Fees, not by us
+              or by you. It's the one path with no recovery value, and our
+              goal is to keep it handled, not landfilled, though we haven't
+              processed a device yet to prove that out.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="components" style="padding-top: 0">
+        <div class="kicker reveal">The full picture</div>
+        <h2 class="sec reveal">Component-by-component breakdown</h2>
+        <p class="sec-sub reveal d1">
+          Who buys each part of your phone, and what it becomes.
+        </p>
+        <div class="tbl-wrap reveal">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Who buys it</th>
+                <th>What it becomes</th>
+                <th>Why it matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Battery cells</td>
+                <td>LED &amp; power-bank makers</td>
+                <td>Work lights, power banks, solar lights</td>
+                <td class="val">70–80% capacity saved from waste</td>
+              </tr>
+              <tr>
+                <td>Screen</td>
+                <td>Repair shops</td>
+                <td>Replacement display</td>
+                <td class="val">Highest-value part; saves another phone</td>
+              </tr>
+              <tr>
+                <td>Cameras</td>
+                <td>Repair shops, makers</td>
+                <td>Repairs, DIY &amp; robotics projects</td>
+                <td>Complex modules, expensive to make new</td>
+              </tr>
+              <tr>
+                <td>Speakers &amp; motors</td>
+                <td>Repair shops, recyclers</td>
+                <td>Repairs + rare-earth magnet recovery</td>
+                <td>Rare earths are supply-constrained</td>
+              </tr>
+              <tr>
+                <td>Ports &amp; buttons</td>
+                <td>Repair shops</td>
+                <td>Replacement parts</td>
+                <td>Most common repair after screens</td>
+              </tr>
+              <tr>
+                <td>Circuit board</td>
+                <td>Metal recovery firms</td>
+                <td>Gold, silver, copper, palladium</td>
+                <td class="val">Richer than mined ore</td>
+              </tr>
+              <tr>
+                <td>Aluminum frame</td>
+                <td>Metal recyclers</td>
+                <td>New aluminum products</td>
+                <td class="val">~95% energy saved vs. new</td>
+              </tr>
+              <tr>
+                <td>Glass</td>
+                <td>Material processors</td>
+                <td>Tiles, countertops, abrasives</td>
+                <td>Downcycled, not landfilled</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="impact-math" style="padding-top: 0">
+        <div class="kicker reveal">Why this works</div>
+        <h2 class="sec reveal">The environmental math</h2>
+        <p class="sec-sub reveal d1">
+          The key idea: most of a phone's footprint happens before it's ever
+          switched on.
+        </p>
+        <div class="why">
+          <div class="card reveal d1">
+            <div>
+              <h3>Manufacturing dominates</h3>
+              <p>
+                Around 80% of a smartphone's lifetime emissions come from making
+                it (mining, refining, fabrication), not from using it. Reusing
+                parts attacks that 80%.
+              </p>
+            </div>
+          </div>
+          <div class="card reveal d2">
+            <div>
+              <h3>Reuse &gt; recycling</h3>
+              <p>
+                Recycling melts things down and rebuilds them, and that costs
+                energy. Reuse skips the whole cycle: a reused screen has almost
+                zero added footprint.
+              </p>
+            </div>
+          </div>
+          <div class="card reveal d3">
+            <div>
+              <h3>Drawers are the blocker</h3>
+              <p>
+                Billions of phones sit unused worldwide. The materials exist,
+                they're just parked, and paying cash is what finally opens the
+                drawer.
+              </p>
+            </div>
+          </div>
+          <div class="card reveal d4">
+            <div>
+              <h3>Displacement is the win</h3>
+              <p>
+                Every reused part displaces a newly manufactured one. That's the
+                metric we optimize: not tonnes collected, but manufacturing
+                avoided.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="zero reveal">
+          Our goal: nothing leaves our facility as garbage, only as a
+          product, a part, or a raw material.
+        </div>
+      </section>
+
+      <section id="comparison" style="padding-top: 0">
+        <div class="kicker reveal">The real alternative</div>
+        <h2 class="sec reveal">GreenVolt versus sending it anywhere else</h2>
+        <p class="sec-sub reveal d1">
+          Same broken phone, two different endings. Here's what typically
+          happens depending on where you send it.
+        </p>
+        <div class="compare-grid">
+          <div class="detail reveal">
+            <div>
+              <div class="tag">With GreenVolt</div>
+              <h3>Every component gets a destination</h3>
+              <ol>
+                <li>
+                  Photographed and graded into one of three tiers: battery
+                  fault only, screen fault only, or beyond economical repair
+                </li>
+                <li>Disassembled by hand, not shredded</li>
+                <li>
+                  Battery, screen, camera, and board each routed to whoever
+                  values that part most
+                </li>
+                <li>
+                  Anything truly unusable goes to certified domestic recyclers
+                  (Call2Recycle, EPRA), funded by the manufacturer, not you
+                </li>
+              </ol>
+              <p>
+                <b
+                  >Our goal is as close to 0% landfill as a physical process can
+                  get.</b
+                >
+                That's a target we're built around, not a measured result, since
+                we haven't processed a device yet.
+              </p>
+            </div>
+          </div>
+          <div class="detail reveal d1">
+            <div>
+              <div class="tag">A typical trade-in or generic recycler</div>
+              <h3>Only resellable whole devices get attention</h3>
+              <ol>
+                <li>Tested for resale as a complete, working device</li>
+                <li>
+                  If it doesn't power on or can't be resold whole, it's rejected
+                  or bundled into generic e-waste streams
+                </li>
+                <li>
+                  Individual components are rarely harvested, since the business
+                  model is reselling whole phones
+                </li>
+                <li>
+                  Bundled e-waste often ends up outside formal recycling
+                  entirely; for small electronics specifically, an estimated
+                  8% is discarded straight to landfill, and up to 20% more is
+                  exported, much of it processed informally
+                </li>
+              </ol>
+              <p>
+                <b
+                  >Globally, only 22.3% of e-waste is documented as formally
+                  collected and recycled</b
+                >
+                (UN Global E-waste Monitor, 2024). The remaining share gets
+                traded, stockpiled, or processed informally, sometimes through
+                unsafe methods like open burning to recover metals.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="band reveal">
+        <div class="inner">
+          <h2>Give your phone its next life.</h2>
+          <p>Every part has somewhere better to be than a drawer.</p>
+          <a onclick="goQuote()">Get my quote →</a>
+        </div>
+      </div>
     </div>
-    <div>
-      <h4>Site</h4>
-      <a onclick="go('home')">Home</a>
-      <a onclick="go('how')">How it works</a>
-      <a onclick="go('journey')">Where phones go</a>
-      <a onclick="go('about')">About us</a>
+    <!-- /journey -->
+
+    <!-- ================= ABOUT ================= -->
+    <div class="page" id="page-about">
+      <div class="page-hero">
+        <h1>We mine drawers, <em>not the earth</em></h1>
+        <p>
+          GreenVolt is Team Green's answer to a simple, absurd fact: the world's
+          most resource-rich "mine" is sitting in kitchen drawers.
+        </p>
+      </div>
+
+      <div class="toc">
+        <div class="inner">
+          <span class="label">On this page</span>
+          <a href="#mission">Mission &amp; vision</a>
+          <a href="#story">Our story</a>
+          <a href="#values-sec">What we believe</a>
+          <a href="#team-sec">The team</a>
+        </div>
+      </div>
+
+      <section id="mission" style="padding-top: 50px">
+        <div class="kicker reveal">Why we exist</div>
+        <h2 class="sec reveal">Mission &amp; vision</h2>
+        <p class="sec-sub reveal d1"></p>
+        <div class="detail reveal">
+          <div>
+            <h3>Our mission</h3>
+            <p>
+              To get every idle phone out of the drawer and every one of its
+              components into active use, paying people fairly for what they
+              own, and proving that a dead phone is a resource, not waste.
+            </p>
+          </div>
+        </div>
+        <div class="detail reveal">
+          <div>
+            <h3>Our vision</h3>
+            <p>
+              A world where "throwing away electronics" sounds as outdated as
+              burning garbage in the backyard, where every device's end of life
+              is simply the start of its components' next one. Organ donation,
+              for phones.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="story" style="padding-top: 0">
+        <div class="kicker reveal">How this started</div>
+        <h2 class="sec reveal">Our story</h2>
+        <p class="sec-sub reveal d1"></p>
+        <div class="detail reveal">
+          <div>
+            <p>
+              GreenVolt was born at
+              <b>Shad 2026 at the University of Alberta</b>, where our team was
+              challenged to reimagine the lifecycle of everyday goods. We
+              started with a question everyone in the room could answer:
+              <b
+                >"how many old phones are in a drawer at your house right
+                now?"</b
+              >
+              Nobody said zero.
+            </p>
+            <p>
+              Then we learned two facts that wouldn't leave us alone: a "dead"
+              phone battery still holds up to 80% of its capacity, and a tonne
+              of phone circuit boards contains more gold than a tonne of gold
+              ore. The waste wasn't being thrown away. It was being
+              <em>stored</em>, invisibly, in millions of homes. Nobody was
+              paying people to open the drawer.
+            </p>
+            <p>
+              So that became the business: pay cash for the phones nobody else
+              wants, take them apart with care, and route every component to
+              whoever values it most. You've read the rest of the site. That's
+              the whole idea, it just needed someone to do it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="values-sec" style="padding-top: 0">
+        <div class="kicker reveal">Our principles</div>
+        <h2 class="sec reveal">What we believe</h2>
+        <p class="sec-sub reveal d1"></p>
+        <div class="values">
+          <div class="vcard reveal d1">
+            <h3>Reuse before recycling</h3>
+            <p>
+              Recycling is the fallback, never the goal. A part in use is worth
+              ten parts melted down, so every component takes the highest step
+              on our waterfall it can.
+            </p>
+          </div>
+          <div class="vcard reveal d2">
+            <h3>Pay people fairly</h3>
+            <p>
+              The drawer stays shut because nobody rewards opening it. Fair cash
+              payouts aren't a marketing cost. They're the engine of the whole
+              model.
+            </p>
+          </div>
+          <div class="vcard reveal d3">
+            <h3>Prove it, don't claim it</h3>
+            <p>
+              "Eco-friendly" is cheap to say. We show every seller exactly where
+              their phone's parts went. If we can't prove a green claim, we
+              don't make it.
+            </p>
+          </div>
+          <div class="vcard reveal d4">
+            <h3>Privacy is non-negotiable</h3>
+            <p>
+              Certified data erasure before any processing, always. We'd rather
+              destroy a sellable part than risk a customer's data.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="team-sec" style="padding-top: 0">
+        <div class="kicker reveal">Team Green</div>
+        <h2 class="sec reveal">The team</h2>
+        <p class="sec-sub reveal d1">
+          Five students, one drawer full of dead phones, and a month at Shad
+          UAlberta 2026.
+        </p>
+        <div class="team">
+          <div class="member reveal d1">
+            <div class="avatar"></div>
+            <h3>[Name]</h3>
+            <p>Project Lead</p>
+          </div>
+          <div class="member reveal d2">
+            <div class="avatar"></div>
+            <h3>[Name]</h3>
+            <p>Research Lead</p>
+          </div>
+          <div class="member reveal d3">
+            <div class="avatar"></div>
+            <h3>[Name]</h3>
+            <p>Design &amp; Prototype</p>
+          </div>
+          <div class="member reveal d4">
+            <div class="avatar"></div>
+            <h3>[Lucas]</h3>
+            <p>Finance Lead</p>
+          </div>
+          <div class="member reveal d4">
+            <div class="avatar"></div>
+            <h3>[Name]</h3>
+            <p>Pitch Lead</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="band reveal">
+        <div class="inner">
+          <h2>Get it out of the drawer, for good.</h2>
+          <p>
+            Your old phone is someone's repair, someone's power bank, someone's
+            gold.
+          </p>
+          <a onclick="goQuote()">Get my quote →</a>
+        </div>
+      </div>
     </div>
-    <div>
-      <h4>Sell</h4>
-      <a onclick="goQuote()">Get a quote</a>
-      <a onclick="go('how')">Shipping &amp; drop boxes</a>
-      <a onclick="go('how')">School drives</a>
-      <a onclick="go('how')">FAQ</a>
+    <!-- /about -->
+
+    <!-- ================= SELL FLOW ================= -->
+    <div class="page" id="page-sell">
+      <div class="page-hero" style="padding-bottom: 20px">
+        <h1>Sell your phone in <em>two steps</em></h1>
+        <p>
+          Your details, then a prepaid shipping label. Two minutes, start to
+          finish.
+        </p>
+      </div>
+
+      <div class="stepper">
+        <div class="st active" id="st1">
+          <div class="dot">1</div>
+          <div class="lbl">Your details</div>
+          <div class="bar2"></div>
+        </div>
+        <div class="st" id="st2">
+          <div class="dot">2</div>
+          <div class="lbl">Shipping label</div>
+        </div>
+      </div>
+
+      <section style="padding-top: 36px">
+        <div class="qsummary">
+          <span>Your quote</span>
+          <span class="amt" id="sell-amount">~$35</span>
+          <span
+            style="font-weight: 600; font-size: 0.88rem; opacity: 0.85"
+            id="sell-path"
+            >battery to LED/power bank makers + parts to repair shops</span
+          >
+        </div>
+
+        <!-- STEP 1: DETAILS -->
+        <div class="sell-panel active" id="panel-1">
+          <div class="sform">
+            <div class="row">
+              <div>
+                <label>Full name</label
+                ><input
+                  id="f-name"
+                  placeholder="Alex Green"
+                  oninput="checkForm()"
+                />
+              </div>
+              <div>
+                <label>Email</label
+                ><input
+                  id="f-email"
+                  type="email"
+                  placeholder="alex@email.com"
+                  oninput="checkForm()"
+                />
+              </div>
+            </div>
+            <label>Street address</label
+            ><input
+              id="f-addr"
+              placeholder="123 Whyte Ave NW"
+              oninput="checkForm()"
+            />
+            <div class="row">
+              <div>
+                <label>City</label
+                ><input
+                  id="f-city"
+                  placeholder="Edmonton"
+                  oninput="checkForm()"
+                />
+              </div>
+              <div>
+                <label>Postal code</label
+                ><input
+                  id="f-postal"
+                  placeholder="T6G 2R3"
+                  oninput="checkForm()"
+                />
+              </div>
+            </div>
+            <label>How should we pay you?</label>
+            <div class="chips payx" id="payx">
+              <button class="chip active" onclick="pickPay(this)">
+                E-transfer
+              </button>
+              <button class="chip" onclick="pickPay(this)">
+                Store credit (+10%)
+              </button>
+            </div>
+          </div>
+          <div class="flow-btns">
+            <button class="fbtn back2" onclick="goQuote()">
+              ← Back to quote
+            </button>
+            <button
+              class="fbtn next"
+              id="next-2"
+              disabled
+              onclick="makeLabel()"
+            >
+              Generate my shipping label →
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: LABEL -->
+        <div class="sell-panel" id="panel-2">
+          <div class="success-blip">
+            <h3>You're all set!</h3>
+            <p>
+              Print the label, box the phone (any box works), and drop it at the
+              post office. Payment lands within 5 days of arrival.
+            </p>
+          </div>
+          <div class="label-card">
+            <div class="label-top">
+              <div class="lg">GreenVolt ⚡</div>
+              <div class="pp">PREPAID · TRACKED</div>
+            </div>
+            <div class="label-body">
+              <div class="label-row">
+                <div>
+                  <h5>FROM</h5>
+                  <p id="lbl-from">
+                    Alex Green<br />123 Whyte Ave NW<br />Edmonton, AB T6G 2R3
+                  </p>
+                </div>
+                <div>
+                  <h5>SHIP TO</h5>
+                  <p>
+                    GreenVolt Processing Facility<br />Unit 4, 11421
+                    Saskatchewan Dr NW<br />Edmonton, AB T6G 2B4
+                  </p>
+                </div>
+              </div>
+              <div class="barcode"></div>
+              <div class="track" id="lbl-track">GRV-2026-000000</div>
+              <div class="label-meta">
+                <span>Service: Standard Ground</span>
+                <span id="lbl-quote">Quote: ~$35</span>
+                <span>Weight: &lt; 0.5 kg</span>
+              </div>
+            </div>
+          </div>
+          <div class="label-actions">
+            <button
+              class="fbtn next"
+              onclick="
+                alert(
+                  'Demo mode. In the real product, this would open your printer dialog.',
+                )
+              "
+            >
+              Print label
+            </button>
+            <button
+              class="fbtn back2"
+              onclick="
+                alert(
+                  'Demo mode. In the real product, this would email you the label and tracking link.',
+                )
+              "
+            >
+              Email it to me
+            </button>
+            <button class="fbtn back2" onclick="go('home')">
+              Done, back home
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
-    <div>
-      <h4>Buy</h4>
-      <a onclick="go('journey')">Graded battery cells</a>
-      <a onclick="go('journey')">Repair parts</a>
-      <a onclick="go('journey')">Board batches</a>
-    </div>
-  </div>
-  <div class="foot-bottom">
-    <b>ReVolt ⚡</b> — Team Green · Shad Design Entrepreneurship 2026 · Demo prototype — not a real service (yet).
-  </div>
-</footer>
+    <!-- /sell -->
 
-<script>
-  // ---- page router ----
-  function go(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    document.querySelectorAll('nav .links a[data-page]').forEach(a =>
-      a.classList.toggle('current', a.dataset.page === page));
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    observeAll();
-  }
-  function goQuote() {
-    go('home');
-    setTimeout(() => document.getElementById('quote').scrollIntoView({ behavior: 'smooth' }), 60);
-  }
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="foot-grid">
+        <div>
+          <a class="logo" onclick="go('home')"
+            >Green<span>Volt</span><span class="bolt">⚡</span></a
+          >
+          <p class="about-blurb" style="margin-top: 10px">
+            We buy old and dead phones, disassemble them, and give every
+            component a second life. Cash for you, and our goal is zero
+            landfill for the planet.
+          </p>
+        </div>
+        <div>
+          <h4>Site</h4>
+          <a onclick="go('home')">Home</a>
+          <a onclick="go('how')">How it works</a>
+          <a onclick="go('journey')">Where phones go</a>
+          <a onclick="go('about')">About us</a>
+        </div>
+        <div>
+          <h4>Sell</h4>
+          <a onclick="goQuote()">Get a quote</a>
+          <a onclick="go('how')">Shipping &amp; drop boxes</a>
+          <a onclick="go('how')">School drives</a>
+          <a onclick="go('how')">FAQ</a>
+        </div>
+        <div>
+          <h4>Buy</h4>
+          <a onclick="go('journey')">Graded battery cells</a>
+          <a onclick="go('journey')">Repair parts</a>
+          <a onclick="go('journey')">Board batches</a>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <b>GreenVolt ⚡</b> · Team Green · Shad Design Entrepreneurship 2026 ·
+        Demo prototype, not a real service yet.
+      </div>
+    </footer>
 
-  // ---- quote logic ----
-  function pick(btn, group) {
-    document.querySelectorAll('#' + group + ' .chip').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    quote();
-  }
-  function val(group) {
-    return parseFloat(document.querySelector('#' + group + ' .chip.active').dataset.v);
-  }
-  function quote() {
-    const base = parseFloat(document.getElementById('brand').value);
-    const age = parseFloat(document.getElementById('age').value);
-    const power = val('power');
-    const screen = val('screen');
-    const amount = Math.max(5, Math.round(base * age * power * screen * 4));
-    const el = document.getElementById('amount');
-    el.textContent = '$' + amount;
-    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    <script>
+      // ---- page router ----
+      function go(page) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document.getElementById("page-" + page).classList.add("active");
+        document
+          .querySelectorAll("nav .links a[data-page]")
+          .forEach((a) =>
+            a.classList.toggle("current", a.dataset.page === page),
+          );
+        window.scrollTo({ top: 0, behavior: "instant" });
+        observeAll();
+      }
+      function goQuote() {
+        go("home");
+        setTimeout(
+          () =>
+            document
+              .getElementById("quote")
+              .scrollIntoView({ behavior: "smooth" }),
+          60,
+        );
+      }
 
-    let path, impact;
-    if (power === 1.0 && screen >= 0.7) {
-      path = 'full harvest — every component top grade';
-      impact = 'Screen and camera to repair shops, battery cells to small-electronics makers, board to metal recovery. Each part displaces one that would\'ve been newly manufactured.';
-    } else if (power === 0.75) {
-      path = 'battery to LED/power bank makers + parts to repair shops';
-      impact = 'Its battery still holds enough capacity to power small electronics for years, and its screen and camera keep other phones alive.';
-    } else if (power === 0.4 && screen >= 0.7) {
-      path = 'screen & camera to repair shops, cells graded for reuse';
-      impact = 'The screen alone can save another phone from the landfill; usable cells power LEDs and power banks; the board goes to precious-metal recovery.';
-    } else {
-      path = 'component salvage + urban mining';
-      impact = 'Speakers, motors and ports feed the repair market; the circuit board yields gold, silver and copper — no new mining required.';
-    }
-    document.getElementById('path').innerHTML = 'Likely path: <b>' + path + '</b>';
-    document.getElementById('impact').innerHTML = '<b>Your impact:</b> ' + impact;
-  }
-  quote();
+      // ---- quote logic ----
+      // Base values are an approximation of relative phone-parts resale value
+      // by model. Anchored to a teardown cost breakdown for the iPhone 11 Pro
+      // Max (component manufacturing cost $490.50, minus non-resellable lines
+      // like assembly/PCB substrate/plastics, minus a 50% used-parts discount
+      // off the remaining sellable components = $181.75 recoverable value).
+      // Other models are scaled off that anchor using the same relative
+      // market position used before (newer/Pro tier > older/base tier), not
+      // exact per-model teardowns. See docs/superpowers/specs for notes.
+      const MODELS = {
+        iphone: [
+          { name: "iPhone 15 Pro / 15 Pro Max", recoverable: 480 },
+          { name: "iPhone 15 / 14 Pro", recoverable: 410 },
+          { name: "iPhone 14 / 13 Pro", recoverable: 340 },
+          { name: "iPhone 13", recoverable: 285 },
+          { name: "iPhone 12", recoverable: 225 },
+          { name: "iPhone 11", recoverable: 182 },
+          { name: "iPhone SE / older", recoverable: 115 },
+        ],
+        samsung: [
+          { name: "Galaxy S24 Ultra / S24+", recoverable: 385 },
+          { name: "Galaxy S23 / S22 Ultra", recoverable: 320 },
+          { name: "Galaxy S22 / S21", recoverable: 225 },
+          { name: "Galaxy A54 / A-series (recent)", recoverable: 160 },
+          { name: "Galaxy A14 / older A-series", recoverable: 100 },
+        ],
+        pixel: [
+          { name: "Pixel 9 Pro / 8 Pro", recoverable: 295 },
+          { name: "Pixel 8 / 7 Pro", recoverable: 225 },
+          { name: "Pixel 7 / 6 Pro", recoverable: 170 },
+          { name: "Pixel 6a / 6", recoverable: 125 },
+          { name: "Pixel 5 / older", recoverable: 80 },
+        ],
+      };
+      const OTHER_ANDROID_RECOVERABLE = 115;
+      // Share of recoverable component value paid out as cashback (matches
+      // the iPhone 11 Pro Max reference: $181.75 recoverable -> ~$27 payout).
+      const PAYOUT_SHARE = 0.15;
 
-  // ---- sell flow ----
-  let photoCount = 0;
-  function goSell() {
-    document.getElementById('sell-amount').textContent = document.getElementById('amount').textContent;
-    const p = document.getElementById('path').querySelector('b');
-    document.getElementById('sell-path').textContent = p ? p.textContent : '';
-    document.getElementById('lbl-quote').textContent = 'Quote: ' + document.getElementById('amount').textContent;
-    go('sell');
-    setStep(1);
-  }
-  function setStep(n) {
-    for (let i = 1; i <= 3; i++) {
-      document.getElementById('panel-' + i).classList.toggle('active', i === n);
-      const st = document.getElementById('st' + i);
-      st.classList.toggle('active', i === n);
-      st.classList.toggle('done', i < n);
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  function addPhotos(files) {
-    const thumbs = document.getElementById('thumbs');
-    [...files].forEach(f => {
-      if (!f.type.startsWith('image/')) return;
-      photoCount++;
-      const t = document.createElement('div');
-      t.className = 'thumb';
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(f);
-      const rm = document.createElement('button');
-      rm.className = 'rm'; rm.textContent = '✕';
-      rm.onclick = () => { t.remove(); photoCount--; updatePhotoUI(); };
-      t.appendChild(img); t.appendChild(rm);
-      thumbs.appendChild(t);
-    });
-    updatePhotoUI();
-  }
-  function updatePhotoUI() {
-    for (let i = 1; i <= 3; i++)
-      document.getElementById('tip-' + i).classList.toggle('got', photoCount >= i);
-    const btn = document.getElementById('next-1');
-    btn.disabled = photoCount < 2;
-    btn.textContent = photoCount < 2 ? 'Continue → (add at least 2 photos)' : 'Continue →';
-  }
-  function checkForm() {
-    const ok = ['f-name','f-email','f-addr','f-city','f-postal']
-      .every(id => document.getElementById(id).value.trim().length > 1);
-    document.getElementById('next-2').disabled = !ok;
-  }
-  function pickPay(btn) {
-    document.querySelectorAll('#payx .chip').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-  }
-  function makeLabel() {
-    const name = document.getElementById('f-name').value.trim();
-    const addr = document.getElementById('f-addr').value.trim();
-    const city = document.getElementById('f-city').value.trim();
-    const postal = document.getElementById('f-postal').value.trim().toUpperCase();
-    document.getElementById('lbl-from').innerHTML =
-      name + '<br>' + addr + '<br>' + city + ', AB ' + postal;
-    document.getElementById('lbl-track').textContent =
-      'REV-2026-' + String(Math.floor(100000 + Math.random() * 900000));
-    setStep(3);
-  }
+      function onBrandChange() {
+        const brand = document.getElementById("brand").value;
+        const modelSel = document.getElementById("model");
+        const otherInput = document.getElementById("model-other");
+        if (brand === "other") {
+          modelSel.style.display = "none";
+          otherInput.style.display = "";
+        } else {
+          modelSel.style.display = "";
+          otherInput.style.display = "none";
+          modelSel.innerHTML = MODELS[brand]
+            .map(
+              (m) =>
+                '<option value="' + m.recoverable + '">' + m.name + "</option>",
+            )
+            .join("");
+        }
+        quote();
+      }
+      function modelRecoverableValue() {
+        const brand = document.getElementById("brand").value;
+        return brand === "other"
+          ? OTHER_ANDROID_RECOVERABLE
+          : parseFloat(document.getElementById("model").value);
+      }
+      function pick(btn, group) {
+        document
+          .querySelectorAll("#" + group + " .chip")
+          .forEach((c) => c.classList.remove("active"));
+        btn.classList.add("active");
+        quote();
+      }
+      function val(group) {
+        return parseFloat(
+          document.querySelector("#" + group + " .chip.active").dataset.v,
+        );
+      }
+      function quote() {
+        const recoverable = modelRecoverableValue();
+        const power = val("power");
+        const amount = Math.max(
+          5,
+          Math.round(recoverable * power * PAYOUT_SHARE),
+        );
+        const el = document.getElementById("amount");
+        el.textContent = "~$" + amount;
+        el.classList.remove("pop");
+        void el.offsetWidth;
+        el.classList.add("pop");
 
-  // ---- nav shadow + progress bar ----
-  const nav = document.getElementById('nav');
-  const bar = document.getElementById('progress');
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 10);
-    const h = document.documentElement;
-    bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
-  }, { passive: true });
+        let path, impact;
+        if (power === 0.75) {
+          path = "battery to LED/power bank makers + parts to repair shops";
+          impact =
+            "Its battery still holds enough capacity to power small electronics for years, and its screen and camera keep other phones alive.";
+        } else {
+          path = "component salvage + urban mining";
+          impact =
+            "Speakers, motors and ports feed the repair market; the circuit board yields gold, silver, and copper, with no new mining required.";
+        }
+        document.getElementById("path").innerHTML =
+          "Likely path: <b>" + path + "</b>";
+        document.getElementById("impact").innerHTML =
+          "<b>Your impact:</b> " + impact;
+      }
+      onBrandChange();
 
-  // ---- scroll reveal ----
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-    });
-  }, { threshold: 0.1 });
-  function observeAll() {
-    document.querySelectorAll('.page.active .reveal:not(.visible), .page.active .jcard:not(.visible)')
-      .forEach(el => io.observe(el));
-  }
-  observeAll();
+      // ---- sell flow ----
+      let photoCount = 0;
+      function goSell() {
+        document.getElementById("sell-amount").textContent =
+          document.getElementById("amount").textContent;
+        const p = document.getElementById("path").querySelector("b");
+        document.getElementById("sell-path").textContent = p
+          ? p.textContent
+          : "";
+        document.getElementById("lbl-quote").textContent =
+          "Quote: " + document.getElementById("amount").textContent;
+        go("sell");
+        setStep(1);
+      }
+      function setStep(n) {
+        for (let i = 1; i <= 2; i++) {
+          document
+            .getElementById("panel-" + i)
+            .classList.toggle("active", i === n);
+          const st = document.getElementById("st" + i);
+          st.classList.toggle("active", i === n);
+          st.classList.toggle("done", i < n);
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      function addPhotos(files) {
+        const thumbs = document.getElementById("thumbs");
+        [...files].forEach((f) => {
+          if (!f.type.startsWith("image/")) return;
+          photoCount++;
+          const t = document.createElement("div");
+          t.className = "thumb";
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(f);
+          const rm = document.createElement("button");
+          rm.className = "rm";
+          rm.textContent = "✕";
+          rm.onclick = () => {
+            t.remove();
+            photoCount--;
+            updatePhotoUI();
+          };
+          t.appendChild(img);
+          t.appendChild(rm);
+          thumbs.appendChild(t);
+        });
+        updatePhotoUI();
+      }
+      function updatePhotoUI() {
+        const btn = document.getElementById("sell-btn");
+        btn.disabled = photoCount < 2;
+        btn.textContent =
+          photoCount < 2
+            ? "Sell my phone → (add at least 2 photos)"
+            : "Sell my phone →";
+      }
+      function checkForm() {
+        const ok = ["f-name", "f-email", "f-addr", "f-city", "f-postal"].every(
+          (id) => document.getElementById(id).value.trim().length > 1,
+        );
+        document.getElementById("next-2").disabled = !ok;
+      }
+      function pickPay(btn) {
+        document
+          .querySelectorAll("#payx .chip")
+          .forEach((c) => c.classList.remove("active"));
+        btn.classList.add("active");
+      }
+      function makeLabel() {
+        const name = document.getElementById("f-name").value.trim();
+        const addr = document.getElementById("f-addr").value.trim();
+        const city = document.getElementById("f-city").value.trim();
+        const postal = document
+          .getElementById("f-postal")
+          .value.trim()
+          .toUpperCase();
+        document.getElementById("lbl-from").innerHTML =
+          name + "<br>" + addr + "<br>" + city + ", AB " + postal;
+        document.getElementById("lbl-track").textContent =
+          "GRV-2026-" + String(Math.floor(100000 + Math.random() * 900000));
+        setStep(2);
+      }
 
-  // ---- animated counters ----
-  const counters = document.querySelectorAll('.count');
-  const cio = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      cio.unobserve(e.target);
-      const el = e.target;
-      const target = +el.dataset.target;
-      const prefix = el.dataset.prefix || '';
-      const suffix = el.dataset.suffix || '';
-      const dur = 1600, t0 = performance.now();
-      (function tick(t) {
-        const p = Math.min((t - t0) / dur, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = prefix + Math.round(target * eased).toLocaleString() + suffix;
-        if (p < 1) requestAnimationFrame(tick);
-      })(t0);
-    });
-  }, { threshold: 0.4 });
-  counters.forEach(c => cio.observe(c));
+      // ---- nav shadow + progress bar ----
+      const nav = document.getElementById("nav");
+      const bar = document.getElementById("progress");
+      window.addEventListener(
+        "scroll",
+        () => {
+          nav.classList.toggle("scrolled", window.scrollY > 10);
+          const h = document.documentElement;
+          bar.style.width =
+            (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + "%";
+        },
+        { passive: true },
+      );
 
-  // ---- gentle live counter after animation ----
-  setTimeout(() => {
-    const el = document.querySelector('.count[data-target="12483"]');
-    let phones = 12483;
-    setInterval(() => {
-      if (Math.random() < 0.4) { phones++; el.textContent = phones.toLocaleString(); }
-    }, 3000);
-  }, 3000);
-</script>
-</body>
+      // ---- scroll reveal ----
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("visible");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+      function observeAll() {
+        document
+          .querySelectorAll(
+            ".page.active .reveal:not(.visible), .page.active .jcard:not(.visible)",
+          )
+          .forEach((el) => io.observe(el));
+      }
+      observeAll();
+
+      // ---- animated stat counters (count up once, when scrolled into view) ----
+      const counters = document.querySelectorAll(".count");
+      const cio = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            cio.unobserve(e.target);
+            const el = e.target;
+            const target = +el.dataset.target;
+            const prefix = el.dataset.prefix || "";
+            const suffix = el.dataset.suffix || "";
+            const dur = 1600,
+              t0 = performance.now();
+            (function tick(t) {
+              const p = Math.min((t - t0) / dur, 1);
+              const eased = 1 - Math.pow(1 - p, 3);
+              el.textContent =
+                prefix + Math.round(target * eased).toLocaleString() + suffix;
+              if (p < 1) requestAnimationFrame(tick);
+            })(t0);
+          });
+        },
+        { threshold: 0.4 },
+      );
+      counters.forEach((c) => cio.observe(c));
+    </script>
+  </body>
 </html>
