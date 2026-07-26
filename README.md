@@ -2,7 +2,7 @@
 
 Team Green · Shad Design Entrepreneurship 2026
 
-A demo website for GreenVolt: we buy old and dead phones, disassemble them, and sell every component to whoever values it most. Battery cells go to LED and power-bank makers, screens go to repair shops, and circuit boards go to precious-metal recovery. Cash for you, zero landfill.
+A demo website for GreenVolt: we buy old and dead phones, disassemble them, and sell every component to whoever values it most.
 
 ## Run it
 
